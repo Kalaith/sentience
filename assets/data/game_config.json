@@ -1,0 +1,11 @@
+{
+  "game_name": "sentience",
+  "display_name": "Sentience",
+  "save_slot": "autosave",
+  "version": "1.0.0",
+  "player_speed": 185.0,
+  "crouch_speed": 92.0,
+  "jump_velocity": -415.0,
+  "gravity": 980.0,
+  "air_control": 0.82
+}

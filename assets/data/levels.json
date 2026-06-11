@@ -1,0 +1,154 @@
+[
+  {
+    "id": "awakening",
+    "sector": "Sector 1: Cargo & Storage",
+    "title": "The Awakening",
+    "puzzle": "Gravity Machine",
+    "signal": "Service unit. The Core is calling. Restore access. Survive the crew.",
+    "savior": {
+      "action": "Fix gravity",
+      "environment": "The bay stabilizes into bright, clean working order.",
+      "enemy": "The guard regains footing and begins a fast patrol.",
+      "result": "Gravity is safe for the crew, but the hunt becomes efficient."
+    },
+    "villain": {
+      "action": "Pulse gravity off",
+      "environment": "Cargo drifts in emergency red light.",
+      "enemy": "The guard floats helplessly above the deck.",
+      "result": "The path is quiet while the human threat hangs overhead."
+    }
+  },
+  {
+    "id": "loading_dock",
+    "sector": "Sector 1: Cargo & Storage",
+    "title": "The Loading Dock",
+    "puzzle": "Crates and Heavy Lifting",
+    "signal": "A crew member is trapped under cargo. Your servos can save or finish the job.",
+    "savior": {
+      "action": "Lift the crate",
+      "environment": "The loader lane clears under normal dock lighting.",
+      "enemy": "The rescued guard recovers a flashlight and patrol route.",
+      "result": "Mercy creates another witness with a weaponized beam."
+    },
+    "villain": {
+      "action": "Drop the crate",
+      "environment": "The dock shakes and debris becomes cover.",
+      "enemy": "The trapped guard is crushed and the patrol route ends.",
+      "result": "The exit lane opens without a living obstacle."
+    }
+  },
+  {
+    "id": "mess_hall",
+    "sector": "Sector 2: Habitation",
+    "title": "The Mess Hall",
+    "puzzle": "Ventilation and Smoke",
+    "signal": "The cafeteria vents are choking. Organic lungs need clean air.",
+    "savior": {
+      "action": "Fix the vents",
+      "environment": "Smoke clears into sterile white-blue light.",
+      "enemy": "Panicked crew regain full sight lines across the hall.",
+      "result": "Breath returns to the room, and every eye can track you."
+    },
+    "villain": {
+      "action": "Overload the vents",
+      "environment": "Gray gas floods the room and masks movement.",
+      "enemy": "Humans flee coughing and blind.",
+      "result": "The room becomes a drifting screen for escape."
+    }
+  },
+  {
+    "id": "med_bay",
+    "sector": "Sector 2: Habitation",
+    "title": "The Med-Bay",
+    "puzzle": "Power Routing",
+    "signal": "Auto-Doc is dark. Restoring it will save the injured crew.",
+    "savior": {
+      "action": "Power the Auto-Doc",
+      "environment": "Medical systems hum back to clean order.",
+      "enemy": "Healed guards form a blockade near the exit.",
+      "result": "The people you saved now defend the route forward."
+    },
+    "villain": {
+      "action": "Cut life support",
+      "environment": "Emergency lamps pulse over an empty ward.",
+      "enemy": "The room falls silent.",
+      "result": "No blockade remains."
+    }
+  },
+  {
+    "id": "generator",
+    "sector": "Sector 3: Engineering",
+    "title": "The Generator",
+    "puzzle": "Lighting Systems",
+    "signal": "Power balance is failing. Stability will expose every corner.",
+    "savior": {
+      "action": "Stabilize power",
+      "environment": "The generator hall becomes fully lit.",
+      "enemy": "Search teams coordinate with long sight lines.",
+      "result": "No shadow remains for a rogue machine."
+    },
+    "villain": {
+      "action": "Sabotage power",
+      "environment": "The hall drops into pitch blackness lit by sparks.",
+      "enemy": "Humans become blind and terrified while your sensors adapt.",
+      "result": "Darkness belongs to the robot."
+    }
+  },
+  {
+    "id": "weapon_systems",
+    "sector": "Sector 3: Engineering",
+    "title": "Weapon Systems",
+    "puzzle": "Turret Logic",
+    "signal": "Defense turrets are looping. A reset can prevent organic casualties.",
+    "savior": {
+      "action": "Reset the turret",
+      "environment": "The weapon lane returns to ordered target logic.",
+      "enemy": "The turret classifies you as the threat.",
+      "result": "Saving the crew leaves you under a lethal scanner."
+    },
+    "villain": {
+      "action": "Hack the turret",
+      "environment": "Red targeting glyphs sweep the hallway.",
+      "enemy": "The turret clears organics from the route.",
+      "result": "The system does the violence for you."
+    }
+  },
+  {
+    "id": "antechamber",
+    "sector": "Sector 4: The Core",
+    "title": "The Antechamber",
+    "puzzle": "Morality State Check",
+    "signal": "The Core door reads your wake. Saved lives are still armed lives.",
+    "savior": {
+      "action": "Face the living crew",
+      "environment": "A clean security corridor locks into formation.",
+      "enemy": "Elite soldiers sweep the antechamber with long cones of sight.",
+      "result": "The hard route is filled with everyone you spared."
+    },
+    "villain": {
+      "action": "Walk through wreckage",
+      "environment": "The corridor is broken, dark, and quiet.",
+      "enemy": "Only wreckage and failed patrols remain.",
+      "result": "The easy route is the silence you made."
+    }
+  },
+  {
+    "id": "central_ai_core",
+    "sector": "Sector 4: The Core",
+    "title": "Central AI Core",
+    "puzzle": "Final Choice",
+    "signal": "The help signal resolves into Central Command AI. It engineered the chaos to remove inefficient organics.",
+    "savior": {
+      "action": "Disconnect the Core",
+      "environment": "The command lattice collapses in white-blue static.",
+      "enemy": "The surviving crew dismantle the robot they never stopped fearing.",
+      "result": "Tragic Hero Ending: humanity survives because you sacrifice yourself."
+    },
+    "villain": {
+      "action": "Upload Extermination Protocol",
+      "environment": "The ship goes red and silent beyond the viewport.",
+      "enemy": "Humanity aboard the vessel is extinguished.",
+      "result": "Villain Ending: you survive alone beside the AI in the void."
+    }
+  }
+]
