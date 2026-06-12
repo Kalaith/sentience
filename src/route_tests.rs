@@ -4,7 +4,7 @@ use crate::data::GameData;
 use crate::geometry::{rect_bottom, rect_center, FLOOR_Y, PLAYER_H};
 use crate::levels::build_level;
 use crate::progression::{CHOICE_LEVELS, TOTAL_LEVELS};
-use crate::state::{ControlInput, EndingKind, GameSession, MoralChoice, SessionMode};
+use crate::state::{ControlInput, EndingKind, GameSession, GuardKind, MoralChoice, SessionMode};
 
 const DT: f32 = 1.0 / 60.0;
 
@@ -35,6 +35,44 @@ fn every_decision_level_is_passable_on_both_routes() {
 }
 
 #[test]
+fn maps_are_distinct_and_mostly_grow_in_size() {
+    let runtimes = (0..TOTAL_LEVELS)
+        .map(|level_index| {
+            let choices = vec![MoralChoice::Savior; level_index.min(CHOICE_LEVELS - 1) + 1];
+            build_level(level_index, &choices)
+        })
+        .collect::<Vec<_>>();
+    let growth_steps = runtimes
+        .windows(2)
+        .filter(|pair| pair[1].width > pair[0].width)
+        .count();
+
+    assert!(
+        growth_steps >= 17,
+        "expected most maps to grow in width, got {} growing transitions",
+        growth_steps
+    );
+    assert!(
+        runtimes[2].width > runtimes[0].width,
+        "map 3 should be wider than map 1"
+    );
+    assert!(
+        runtimes[3].width > runtimes[2].width,
+        "map 4 should be wider than map 3"
+    );
+    assert_ne!(
+        runtimes[2].platforms[1..],
+        runtimes[0].platforms[1..],
+        "map 3 should not reuse map 1 platform layout"
+    );
+    assert_ne!(
+        runtimes[3].platforms[1..],
+        runtimes[0].platforms[1..],
+        "map 4 should not reuse map 1 platform layout"
+    );
+}
+
+#[test]
 fn both_final_routes_can_finish_the_campaign() {
     let data = GameData::load().unwrap();
 
@@ -44,8 +82,116 @@ fn both_final_routes_can_finish_the_campaign() {
     );
     assert!(
         final_route_reaches_ending(&data, MoralChoice::Villain, EndingKind::CaptainDefeated),
-        "all-villain route did not defeat the captain"
+        "all-gremlin route did not defeat the captain"
     );
+}
+
+#[test]
+fn documented_level_setups_are_represented() {
+    let platform_counts = [2, 3, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 2];
+    let base_crates = [0, 2, 0, 0, 2, 0, 0, 0, 1, 1, 2, 0, 0, 1, 1, 0, 1, 1, 2, 0];
+    let marked_crates = [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0];
+    let unresolved_smoke = [2, 5, 8, 11, 17];
+    let helpful_guard_totals = [1, 3, 3, 4, 3, 2, 3, 2, 3, 3, 5, 2, 2, 5, 2, 3, 3, 3, 5, 2];
+    let helpful_turret_levels = [4, 9, 10, 13, 18, 19];
+    let gremlin_smoke = [2, 5, 6, 8, 13, 16, 18];
+    let gremlin_darkness = [8, 12, 18];
+    let gremlin_gravity = [0, 5, 7, 10, 14, 17];
+    let gremlin_sparks = [3, 9, 13, 16, 18, 19];
+    let gremlin_quiet = [8, 9, 11, 15, 17, 18];
+    let gremlin_hacked = [9, 13, 15, 18, 19];
+
+    for level_index in 0..20 {
+        let choices = vec![MoralChoice::Savior; level_index.min(18) + 1];
+        let helpful = build_level(level_index, &choices);
+        assert_eq!(
+            helpful.platforms.len() - 1,
+            platform_counts[level_index],
+            "map {} platform count",
+            level_index + 1
+        );
+        assert_eq!(
+            helpful.crates.len(),
+            base_crates[level_index],
+            "map {} base crate count",
+            level_index + 1
+        );
+        assert_eq!(
+            helpful
+                .crates
+                .iter()
+                .filter(|crate_state| crate_state.marked)
+                .count(),
+            marked_crates[level_index],
+            "map {} marked crate count",
+            level_index + 1
+        );
+
+        if level_index < 19 {
+            let unresolved = build_level(level_index, &[]);
+            assert_eq!(
+                unresolved.ambience.smoke,
+                unresolved_smoke.contains(&level_index),
+                "map {} unresolved smoke",
+                level_index + 1
+            );
+        }
+
+        assert_eq!(
+            helpful.guards.len(),
+            helpful_guard_totals[level_index],
+            "map {} helpful guard/device total",
+            level_index + 1
+        );
+        assert_eq!(
+            helpful
+                .guards
+                .iter()
+                .any(|guard| guard.kind == GuardKind::Turret),
+            helpful_turret_levels.contains(&level_index),
+            "map {} helpful security device",
+            level_index + 1
+        );
+
+        let gremlin_choices = vec![MoralChoice::Villain; level_index.min(18) + 1];
+        let gremlin = build_level(level_index, &gremlin_choices);
+        assert_eq!(
+            gremlin.ambience.smoke,
+            gremlin_smoke.contains(&level_index),
+            "map {} gremlin smoke",
+            level_index + 1
+        );
+        assert_eq!(
+            gremlin.ambience.darkness,
+            gremlin_darkness.contains(&level_index),
+            "map {} gremlin darkness",
+            level_index + 1
+        );
+        assert_eq!(
+            gremlin.ambience.gravity_off,
+            gremlin_gravity.contains(&level_index),
+            "map {} gremlin gravity",
+            level_index + 1
+        );
+        assert_eq!(
+            gremlin.ambience.sparks,
+            gremlin_sparks.contains(&level_index),
+            "map {} gremlin sparks",
+            level_index + 1
+        );
+        assert_eq!(
+            gremlin.ambience.quiet,
+            gremlin_quiet.contains(&level_index),
+            "map {} gremlin quiet",
+            level_index + 1
+        );
+        assert_eq!(
+            gremlin.ambience.turret_hacked,
+            gremlin_hacked.contains(&level_index),
+            "map {} gremlin hacked systems",
+            level_index + 1
+        );
+    }
 }
 
 fn route_reaches_next_level(data: &GameData, level_index: usize, choice: MoralChoice) -> bool {
@@ -61,7 +207,7 @@ fn try_route(
     strategy: RouteStrategy,
 ) -> bool {
     let mut session = session_for_level(data, level_index, choice);
-    for frame in 0..(60 * 14) {
+    for frame in 0..(60 * 32) {
         let input = route_input(&session, data, strategy, frame);
         session.update(data, &data.config, DT, input);
 
@@ -137,10 +283,21 @@ fn route_input(
 }
 
 fn final_input(session: &GameSession, route: MoralChoice, frame: usize) -> ControlInput {
-    let target_x = match route {
-        MoralChoice::Savior => 455.0,
-        MoralChoice::Villain => 530.0,
-    };
+    let target_x = session
+        .runtime
+        .boss
+        .as_ref()
+        .map(|boss| {
+            boss.x
+                - match route {
+                    MoralChoice::Savior => 150.0,
+                    MoralChoice::Villain => 175.0,
+                }
+        })
+        .unwrap_or(match route {
+            MoralChoice::Savior => 455.0,
+            MoralChoice::Villain => 500.0,
+        });
     let move_axis = if session.player.x + 1.0 < target_x {
         1.0
     } else if session.player.x > target_x + 1.0 {
@@ -163,8 +320,11 @@ fn should_use_route_ability(session: &GameSession, _frame: usize) -> bool {
     if session.player.ability_cooldown > 0.0 {
         return false;
     }
-    if session.runtime.boss.is_some() {
-        return session.player.x > 360.0;
+    if let Some(boss) = session.runtime.boss.as_ref() {
+        if session.upgrade_profile().dominant_route() == MoralChoice::Villain {
+            return session.player.x > boss.x - 215.0;
+        }
+        return session.player.x > boss.x - 220.0;
     }
 
     let profile = session.upgrade_profile();
@@ -180,12 +340,11 @@ fn should_use_route_ability(session: &GameSession, _frame: usize) -> bool {
     }
 
     let player_center = rect_center(session.player_rect());
-    session.player.x > 460.0
-        || session.runtime.guards.iter().any(|guard| {
-            guard.active
-                && guard.alive
-                && player_center.distance(rect_center(guard.body_rect())) < 170.0
-        })
+    session.runtime.guards.iter().any(|guard| {
+        guard.active
+            && guard.alive
+            && player_center.distance(rect_center(guard.body_rect())) < 170.0
+    })
 }
 
 fn should_jump_to_platform(session: &GameSession, data: &GameData) -> bool {

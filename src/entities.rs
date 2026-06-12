@@ -1,7 +1,7 @@
 //! Runtime entities shared by simulation, level construction, and rendering.
 
 use crate::geometry::FLOOR_Y;
-use crate::state::{EndingKind, LevelPhase};
+use crate::state::LevelPhase;
 use macroquad::prelude::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -22,13 +22,6 @@ impl BossKind {
         match self {
             Self::CentralAi => "Central AI",
             Self::Captain => "Captain",
-        }
-    }
-
-    pub fn ending(self) -> EndingKind {
-        match self {
-            Self::CentralAi => EndingKind::AiDefeated,
-            Self::Captain => EndingKind::CaptainDefeated,
         }
     }
 }
@@ -110,6 +103,11 @@ impl GuardState {
         self
     }
 
+    pub(crate) fn with_y(mut self, y: f32) -> Self {
+        self.y = y;
+        self
+    }
+
     pub(crate) fn with_detection(mut self, range: f32, fov_degrees: f32) -> Self {
         self.range = range;
         self.fov_degrees = fov_degrees;
@@ -121,14 +119,14 @@ impl GuardState {
         self
     }
 
-    pub(crate) fn dead(mut self) -> Self {
-        self.active = false;
-        self.alive = false;
+    pub(crate) fn panicked(mut self) -> Self {
+        self.panicked = true;
         self
     }
 
-    pub(crate) fn panicked(mut self) -> Self {
-        self.panicked = true;
+    pub(crate) fn floating(mut self) -> Self {
+        self.active = false;
+        self.floating = true;
         self
     }
 
@@ -215,6 +213,157 @@ pub struct CrateState {
     pub marked: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SetpieceKind {
+    ScrapHeap,
+    BrokenCatwalk,
+    CrouchTunnel,
+    HangingScrap,
+    DroppedScrapBridge,
+    FloatingScrapCover,
+    ExitLedge,
+    CargoBelt,
+    CargoLift,
+    ScannerGate,
+    DroneLane,
+    SupplyPalletBridge,
+    MagnetizedCrateTrail,
+    LockerBank,
+    DeconShower,
+    SprayLift,
+    SuitRack,
+    MaintenanceCrawlspace,
+    FoamBouncePad,
+    DiningTable,
+    ServingRail,
+    MealCart,
+    KitchenPass,
+    DiningPit,
+    DishReturnRamp,
+    SlipperyGel,
+    EvacuationFlow,
+    ReceptionDesk,
+    TreatmentRoom,
+    AutoDoc,
+    BedLift,
+    RecoveryHallway,
+    TriageDoor,
+    RollingBed,
+    BandageCocoon,
+    MedicDrone,
+    VentShaft,
+    MaintenanceRoom,
+    FanColumn,
+    CrosswindGap,
+    SmokePocket,
+    WallNet,
+    StreamerPurge,
+    IrrigationTrench,
+    VineCanopy,
+    MaintenanceWalkway,
+    SeedPod,
+    PlantBridge,
+    SprinklerZone,
+    PlantCurtain,
+    VineTunnel,
+    TendrilGate,
+    AirlockStaging,
+    PressureChamber,
+    PressureDoor,
+    ExteriorMaintenanceStrip,
+    TetherAnchor,
+    SafetyNet,
+    PressureBurst,
+    FrozenAisle,
+    CryoPodRoom,
+    ThawSwitch,
+    ColdServicePipe,
+    SleeperPod,
+    ThermalBlanketCover,
+    QueueScannerCover,
+    BadgeGate,
+    SecurityOffice,
+    MaintenanceBypass,
+    BadgePrinter,
+    GateJam,
+    WrongBadgeLoop,
+    DroneChargingPad,
+    DroneRail,
+    DispatchTower,
+    DroneServicedHatch,
+    RescueDronePath,
+    EnthusiasticDroneCarry,
+    BrigCellDoor,
+    PrisonerWalkway,
+    DoorControlRoom,
+    EvidenceLock,
+    OneWayDoor,
+    WrongWaitingRoom,
+    RevolvingDoorLoop,
+    ObservationDeck,
+    TelescopeGantry,
+    ShutterZone,
+    SearchlightBeam,
+    RadiationLock,
+    ShadowLane,
+    GlareLane,
+    WeaponLockerCorridor,
+    ArmoryCatwalk,
+    FoamPit,
+    StunTurretLane,
+    FoamLauncher,
+    TargetingConsole,
+    FoamPile,
+    LaundryFloor,
+    LaundryTube,
+    SuctionBurst,
+    TubeExit,
+    RollingLaundryCart,
+    LaundryBin,
+    UniformRetrievalTube,
+    TrophyHall,
+    CommandDesk,
+    EvidenceSafe,
+    PrivateEscapeCorridor,
+    BriefingRoom,
+    CommandLock,
+    FalseOrderTrail,
+    ReactorEntry,
+    HeatPipeMaze,
+    SteamJet,
+    CoolantValve,
+    ReactorWalkway,
+    FoamBubble,
+    HeatZone,
+    LiftLanding,
+    CentralElevator,
+    ServiceLadder,
+    LiftScheduler,
+    WrongFloorDoor,
+    ElevatorSecurityUnit,
+    EmptyLiftWindow,
+    EvidenceArchive,
+    DataCanister,
+    MemoryDoor,
+    FirewallCorridor,
+    TruthRoute,
+    PropagandaRoute,
+    AiCamera,
+    CoreSeal,
+}
+
+#[derive(Debug, Clone)]
+pub struct SetpieceState {
+    pub kind: SetpieceKind,
+    pub rect: Rect,
+}
+
+impl SetpieceState {
+    pub(crate) fn new(kind: SetpieceKind, rect: Rect) -> Self {
+        Self { kind, rect }
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub struct Ambience {
     pub clean: bool,
@@ -230,8 +379,10 @@ pub struct Ambience {
 #[derive(Debug, Clone)]
 pub struct LevelRuntime {
     pub phase: LevelPhase,
+    pub width: f32,
     pub platforms: Vec<Rect>,
     pub crates: Vec<CrateState>,
+    pub setpieces: Vec<SetpieceState>,
     pub guards: Vec<GuardState>,
     pub console: Option<Rect>,
     pub core: Option<Rect>,

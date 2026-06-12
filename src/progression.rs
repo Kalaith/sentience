@@ -5,6 +5,12 @@ use crate::state::MoralChoice;
 pub const CHOICE_LEVELS: usize = 19;
 pub const TOTAL_LEVELS: usize = 20;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CampaignRoute {
+    Hero,
+    Gremlin,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct UpgradeProfile {
     pub savior: usize,
@@ -50,6 +56,11 @@ impl UpgradeProfile {
     }
 }
 
-pub fn campaign_bias(choices: &[MoralChoice]) -> MoralChoice {
-    UpgradeProfile::from_choices(choices).dominant_route()
+pub fn campaign_route(choices: &[MoralChoice]) -> CampaignRoute {
+    let profile = UpgradeProfile::from_choices(choices);
+    if profile.savior >= profile.villain {
+        CampaignRoute::Hero
+    } else {
+        CampaignRoute::Gremlin
+    }
 }

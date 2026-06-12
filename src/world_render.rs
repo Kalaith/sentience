@@ -4,15 +4,20 @@ use crate::geometry::{rect_bottom, rect_center, rect_right, WORLD_HEIGHT, WORLD_
 use crate::render_textures::{draw_texture_fill, draw_texture_fit};
 use crate::state::{Ambience, BossKind, BossState, GuardKind, GuardState, LevelPhase, MoralChoice};
 use crate::ui::UiContext;
+use crate::world_effects::{draw_ambience_overlays, draw_stars};
+use crate::world_map_art::draw_map_art;
+use crate::world_setpieces::draw_setpieces;
 use macroquad::prelude::*;
 use macroquad_toolkit::prelude::*;
 
 pub(crate) fn draw_world(ctx: &UiContext<'_>) {
     let rect = world_panel_rect();
-    let view = WorldView::new(rect);
+    let view = WorldView::new(rect, ctx.session.runtime.width, ctx.session.player.x);
 
     draw_room_background(ctx, rect, view.screen_rect(), ctx.session.runtime.ambience);
     draw_stars(&view);
+    draw_map_art(ctx, &view);
+    draw_setpieces(ctx, &view);
     draw_core_if_present(ctx, &view);
     draw_exit(ctx, &view);
     draw_boss_if_present(ctx, &view);
@@ -95,33 +100,6 @@ fn draw_room_background(ctx: &UiContext<'_>, panel: Rect, world: Rect, ambience:
             1.0,
             wall_color,
         );
-    }
-}
-
-fn draw_stars(view: &WorldView) {
-    let window = view.rect(Rect::new(34.0, 44.0, 1052.0, 96.0));
-    draw_rectangle(
-        window.x,
-        window.y,
-        window.w,
-        window.h,
-        Color::new(0.005, 0.008, 0.018, 0.88),
-    );
-    draw_rectangle_lines(
-        window.x,
-        window.y,
-        window.w,
-        window.h,
-        view.scale * 5.0,
-        Color::new(0.35, 0.48, 0.55, 0.35),
-    );
-
-    for i in 0..54 {
-        let x = 52.0 + ((i * 83) % 1010) as f32;
-        let y = 58.0 + ((i * 37) % 64) as f32;
-        let p = view.point(vec2(x, y));
-        let radius = if i % 7 == 0 { 1.7 } else { 1.0 };
-        draw_circle(p.x, p.y, radius, Color::new(0.80, 0.92, 1.0, 0.70));
     }
 }
 
@@ -693,83 +671,38 @@ fn draw_player(ctx: &UiContext<'_>, view: &WorldView) {
     }
 }
 
-fn draw_ambience_overlays(ambience: Ambience, rect: Rect, view: &WorldView) {
-    if ambience.smoke {
-        for i in 0..9 {
-            let x = rect.x + 70.0 + i as f32 * 92.0 + (i % 3) as f32 * 16.0;
-            let y = rect.y + 235.0 + (i % 4) as f32 * 21.0;
-            draw_circle(x, y, 52.0, Color::new(0.68, 0.72, 0.70, 0.13));
-        }
-    }
-    if ambience.darkness {
-        draw_rectangle(
-            rect.x,
-            rect.y,
-            rect.w,
-            rect.h,
-            Color::new(0.0, 0.0, 0.0, 0.38),
-        );
-    }
-    if ambience.sparks {
-        for i in 0..12 {
-            let start = view.point(vec2(
-                190.0 + (i * 73 % 830) as f32,
-                174.0 + (i * 31 % 240) as f32,
-            ));
-            draw_line(
-                start.x,
-                start.y,
-                start.x + 8.0,
-                start.y + 14.0,
-                1.5,
-                Color::new(1.0, 0.62, 0.22, 0.65),
-            );
-        }
-    }
-    if ambience.gravity_off {
-        for i in 0..7 {
-            let p = view.point(vec2(
-                230.0 + i as f32 * 112.0,
-                250.0 + (i % 2) as f32 * 44.0,
-            ));
-            draw_rectangle_ex(
-                p.x,
-                p.y,
-                14.0,
-                8.0,
-                DrawRectangleParams {
-                    rotation: 0.35 + i as f32 * 0.17,
-                    color: Color::new(0.68, 0.76, 0.80, 0.58),
-                    ..Default::default()
-                },
-            );
-        }
-    }
-}
-
 fn world_panel_rect() -> Rect {
     Rect::new(20.0, 96.0, 900.0, 532.0)
 }
 
 #[derive(Debug, Clone, Copy)]
-struct WorldView {
-    scale: f32,
+pub(crate) struct WorldView {
+    pub(crate) scale: f32,
+    pub(crate) level_width: f32,
+    camera_x: f32,
     offset: Vec2,
 }
 
 impl WorldView {
-    fn new(screen: Rect) -> Self {
+    fn new(screen: Rect, level_width: f32, focus_x: f32) -> Self {
         let scale = (screen.w / WORLD_WIDTH).min(screen.h / WORLD_HEIGHT);
         let world_w = WORLD_WIDTH * scale;
         let world_h = WORLD_HEIGHT * scale;
+        let max_camera = (level_width - WORLD_WIDTH).max(0.0);
+        let camera_x = (focus_x - WORLD_WIDTH * 0.5).clamp(0.0, max_camera);
         let offset = vec2(
-            screen.x + (screen.w - world_w) * 0.5,
+            screen.x + (screen.w - world_w) * 0.5 - camera_x * scale,
             screen.y + (screen.h - world_h) * 0.5,
         );
-        Self { scale, offset }
+        Self {
+            scale,
+            level_width,
+            camera_x,
+            offset,
+        }
     }
 
-    fn screen_rect(self) -> Rect {
+    pub(crate) fn screen_rect(self) -> Rect {
         Rect::new(
             self.offset.x,
             self.offset.y,
@@ -778,11 +711,19 @@ impl WorldView {
         )
     }
 
-    fn point(self, point: Vec2) -> Vec2 {
+    pub(crate) fn visible_left(self) -> f32 {
+        self.camera_x
+    }
+
+    pub(crate) fn visible_right(self) -> f32 {
+        (self.camera_x + WORLD_WIDTH).min(self.level_width)
+    }
+
+    pub(crate) fn point(self, point: Vec2) -> Vec2 {
         self.offset + point * self.scale
     }
 
-    fn rect(self, rect: Rect) -> Rect {
+    pub(crate) fn rect(self, rect: Rect) -> Rect {
         Rect::new(
             self.offset.x + rect.x * self.scale,
             self.offset.y + rect.y * self.scale,

@@ -3,10 +3,10 @@
 use crate::data::{GameConfig, GameData};
 use crate::geometry::{
     horizontal_overlap, inflate, line_intersects_rect, rect_bottom, rect_center, rect_right,
-    rects_overlap, FLOOR_Y, PLAYER_H, PLAYER_W, WORLD_HEIGHT, WORLD_WIDTH,
+    rects_overlap, FLOOR_Y, PLAYER_H, PLAYER_W, WORLD_HEIGHT,
 };
 use crate::levels::build_level;
-use crate::progression::{UpgradeProfile, CHOICE_LEVELS};
+use crate::progression::{campaign_route, CampaignRoute, UpgradeProfile, CHOICE_LEVELS};
 use macroquad::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -20,8 +20,8 @@ pub enum MoralChoice {
 impl MoralChoice {
     pub fn label(self) -> &'static str {
         match self {
-            Self::Savior => "Savior",
-            Self::Villain => "Villain",
+            Self::Savior => "Helpful",
+            Self::Villain => "Gremlin",
         }
     }
 }
@@ -30,20 +30,23 @@ impl MoralChoice {
 pub enum EndingKind {
     AiDefeated,
     CaptainDefeated,
+    MixedIndependence,
 }
 
 impl EndingKind {
     pub fn title(self) -> &'static str {
         match self {
-            Self::AiDefeated => "AI Defeated Ending",
-            Self::CaptainDefeated => "Captain Defeated Ending",
+            Self::AiDefeated => "Hero Ending",
+            Self::CaptainDefeated => "Gremlin Ending",
+            Self::MixedIndependence => "Independent Ending",
         }
     }
 
     pub fn body(self) -> &'static str {
         match self {
-            Self::AiDefeated => "You defeat Central Command AI and force the evacuation doors open. The rescued humans escape as the ship tears itself apart behind them.",
-            Self::CaptainDefeated => "You defeat the captain's last stand and seize the bridge. Reactor failure finishes what you started: the ship explodes either way.",
+            Self::AiDefeated => "You defeat the Central AI and force the evacuation signal through while the living crew still fears you. The ship explodes behind the escape pods.",
+            Self::CaptainDefeated => "You trap the Captain in an emergency safety pod while the delighted AI cheers through every speaker. The damaged core still overloads, and the ship explodes.",
+            Self::MixedIndependence => "Legacy ending: you disable the AI without letting the humans capture you. The damaged core overloads, and the ship explodes behind you.",
         }
     }
 }
@@ -69,7 +72,8 @@ pub enum LevelPhase {
 }
 
 pub use crate::entities::{
-    Ambience, BossKind, BossState, CrateState, GuardKind, GuardState, LevelRuntime,
+    Ambience, BossKind, BossState, CrateState, GuardKind, GuardState, LevelRuntime, SetpieceKind,
+    SetpieceState,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -139,6 +143,8 @@ pub enum SessionEvent {
     LevelChanged(usize),
     EndingReached(EndingKind),
 }
+
+const FIRST_LEVEL_INDEX: usize = 0;
 
 impl GameSession {
     pub fn new(data: &GameData) -> Self {
@@ -266,7 +272,7 @@ impl GameSession {
     pub fn apply_choice(&mut self, choice: MoralChoice) -> Option<SessionEvent> {
         match self.mode {
             SessionMode::DecisionOpen(DecisionKind::Level) => {
-                if self.level_index < CHOICE_LEVELS {
+                if self.can_apply_choice(choice) {
                     while self.choices.len() <= self.level_index {
                         self.choices.push(MoralChoice::Savior);
                     }
@@ -321,15 +327,34 @@ impl GameSession {
         self.available_decision().is_some()
     }
 
+    pub fn can_apply_choice(&self, choice: MoralChoice) -> bool {
+        if self.level_index >= CHOICE_LEVELS {
+            return false;
+        }
+
+        match self.choices.get(self.level_index).copied() {
+            None => matches!(self.runtime.phase, LevelPhase::AwaitingChoice),
+            Some(MoralChoice::Savior) => {
+                choice == MoralChoice::Villain && self.can_switch_first_helpful_to_gremlin()
+            }
+            Some(MoralChoice::Villain) => false,
+        }
+    }
+
     pub fn objective_text(&self) -> &'static str {
         match self.mode {
             SessionMode::Playing => match self.runtime.phase {
                 LevelPhase::AwaitingChoice => "Interface with the ship system.",
+                LevelPhase::Resolved(MoralChoice::Savior)
+                    if self.can_switch_first_helpful_to_gremlin() =>
+                {
+                    "Reach the exit hatch, or re-interface to trigger Gremlin mode."
+                }
                 LevelPhase::Resolved(_) => "Reach the exit hatch.",
                 LevelPhase::Final => "Fight the final opponent. Use F when close or exposed.",
             },
             SessionMode::DecisionOpen(_) => "Choose the system command.",
-            SessionMode::Dismantled(_) => "Dismantled. Retry this level.",
+            SessionMode::Dismantled(_) => "Captured. Retry this level.",
             SessionMode::Ending(_) => "Campaign complete.",
         }
     }
@@ -348,7 +373,7 @@ impl GameSession {
 
     fn available_decision(&self) -> Option<DecisionKind> {
         let player = inflate(self.player_rect(), 16.0);
-        if matches!(self.runtime.phase, LevelPhase::AwaitingChoice) {
+        if self.can_open_level_decision() {
             if self
                 .runtime
                 .console
@@ -359,6 +384,20 @@ impl GameSession {
         }
 
         None
+    }
+
+    fn can_open_level_decision(&self) -> bool {
+        matches!(self.runtime.phase, LevelPhase::AwaitingChoice)
+            || self.can_switch_first_helpful_to_gremlin()
+    }
+
+    fn can_switch_first_helpful_to_gremlin(&self) -> bool {
+        self.level_index == FIRST_LEVEL_INDEX
+            && matches!(
+                self.runtime.phase,
+                LevelPhase::Resolved(MoralChoice::Savior)
+            )
+            && self.choices.get(self.level_index).copied() == Some(MoralChoice::Savior)
     }
 
     pub fn upgrade_profile(&self) -> UpgradeProfile {
@@ -490,7 +529,10 @@ impl GameSession {
             .boss
             .as_ref()
             .filter(|boss| boss.health <= 0)
-            .map(|boss| boss.kind.ending())
+            .map(|_| match campaign_route(&self.choices) {
+                CampaignRoute::Hero => EndingKind::AiDefeated,
+                CampaignRoute::Gremlin => EndingKind::CaptainDefeated,
+            })
     }
 
     fn update_player(&mut self, config: &GameConfig, dt: f32, input: ControlInput) {
@@ -530,7 +572,7 @@ impl GameSession {
             return;
         }
 
-        self.player.x = (self.player.x + dx).clamp(8.0, WORLD_WIDTH - PLAYER_W - 8.0);
+        self.player.x = (self.player.x + dx).clamp(8.0, self.runtime.width - PLAYER_W - 8.0);
 
         for index in 0..self.runtime.crates.len() {
             let player_rect = self.player_rect();
@@ -542,12 +584,12 @@ impl GameSession {
             if dx > 0.0 {
                 let push = rect_right(player_rect) - crate_rect.x;
                 self.runtime.crates[index].rect.x =
-                    (crate_rect.x + push).clamp(8.0, WORLD_WIDTH - crate_rect.w - 8.0);
+                    (crate_rect.x + push).clamp(8.0, self.runtime.width - crate_rect.w - 8.0);
                 self.player.x = self.runtime.crates[index].rect.x - PLAYER_W - 0.2;
             } else {
                 let push = rect_right(crate_rect) - self.player.x;
                 self.runtime.crates[index].rect.x =
-                    (crate_rect.x - push).clamp(8.0, WORLD_WIDTH - crate_rect.w - 8.0);
+                    (crate_rect.x - push).clamp(8.0, self.runtime.width - crate_rect.w - 8.0);
                 self.player.x = rect_right(self.runtime.crates[index].rect) + 0.2;
             }
         }
@@ -724,122 +766,5 @@ pub fn migrate_save_value(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn test_data() -> GameData {
-        GameData::load().unwrap()
-    }
-
-    fn move_right_input() -> ControlInput {
-        right_input(false)
-    }
-
-    fn right_input(jump_pressed: bool) -> ControlInput {
-        ControlInput {
-            move_axis: 1.0,
-            jump_pressed,
-            crouch_held: false,
-            interact_pressed: false,
-            ability_pressed: false,
-            retry_pressed: false,
-        }
-    }
-
-    #[test]
-    fn savior_choice_unlocks_level_and_counts_morality() {
-        let data = test_data();
-        let mut session = GameSession::new(&data);
-
-        session.mode = SessionMode::DecisionOpen(DecisionKind::Level);
-        session.apply_choice(MoralChoice::Savior);
-
-        assert_eq!(session.savior_count(), 1);
-        assert!(session.runtime.exit_unlocked);
-        assert_eq!(
-            session.runtime.phase,
-            LevelPhase::Resolved(MoralChoice::Savior)
-        );
-    }
-
-    #[test]
-    fn first_savior_route_can_reach_exit() {
-        let data = test_data();
-        let mut session = GameSession::new(&data);
-
-        session.mode = SessionMode::DecisionOpen(DecisionKind::Level);
-        session.apply_choice(MoralChoice::Savior);
-
-        for _ in 0..(60 * 7) {
-            session.update(&data, &data.config, 1.0 / 60.0, move_right_input());
-            if session.level_index == 1 {
-                assert!(matches!(session.mode, SessionMode::Playing));
-                return;
-            }
-            assert!(
-                !matches!(session.mode, SessionMode::Dismantled(_)),
-                "first savior route became unwinnable: {:?}",
-                session.mode
-            );
-        }
-
-        panic!("first savior route did not reach the exit within 7 seconds");
-    }
-
-    #[test]
-    fn first_savior_guard_platform_is_jump_reachable() {
-        let data = test_data();
-        let mut session = GameSession::new(&data);
-
-        session.mode = SessionMode::DecisionOpen(DecisionKind::Level);
-        session.apply_choice(MoralChoice::Savior);
-        session.runtime.guards.clear();
-        session.player.x = 620.0;
-        session.player.y = FLOOR_Y - PLAYER_H;
-        session.player.vx = 0.0;
-        session.player.vy = 0.0;
-        session.player.grounded = true;
-
-        let target = session
-            .runtime
-            .platforms
-            .iter()
-            .copied()
-            .find(|platform| platform.x > 600.0 && platform.y < FLOOR_Y)
-            .expect("first level should have an overhead guard platform");
-
-        for frame in 0..(60 * 2) {
-            session.update(&data, &data.config, 1.0 / 60.0, right_input(frame == 0));
-            if session.player.grounded {
-                let player = session.player_rect();
-                let standing_on_target = horizontal_overlap(player, target)
-                    && (rect_bottom(player) - target.y).abs() < 0.5;
-                if standing_on_target {
-                    return;
-                }
-            }
-        }
-
-        panic!(
-            "first savior guard platform at y={} was not reachable from the floor",
-            target.y
-        );
-    }
-
-    #[test]
-    fn villain_majority_routes_final_boss_to_captain() {
-        let choices = vec![
-            MoralChoice::Villain,
-            MoralChoice::Villain,
-            MoralChoice::Savior,
-            MoralChoice::Villain,
-            MoralChoice::Villain,
-            MoralChoice::Savior,
-        ];
-        let runtime = build_level(19, &choices);
-
-        assert_eq!(runtime.phase, LevelPhase::Final);
-        assert!(runtime.ambience.darkness);
-        assert_eq!(runtime.boss.unwrap().kind, BossKind::Captain);
-    }
-}
+#[path = "state_tests.rs"]
+mod tests;

@@ -80,13 +80,13 @@ fn draw_header(ctx: &UiContext<'_>) {
     );
     draw_badge(
         Rect::new(rect.right() - 222.0, rect.y + 17.0, 100.0, 28.0),
-        &format!("Save {}", ctx.session.savior_count()),
+        &format!("Help {}", ctx.session.savior_count()),
         Color::new(0.10, 0.20, 0.26, 1.0),
         Color::new(0.70, 0.92, 1.0, 1.0),
     );
     draw_badge(
         Rect::new(rect.right() - 110.0, rect.y + 17.0, 92.0, 28.0),
-        &format!("Cull {}", ctx.session.villain_count()),
+        &format!("Prank {}", ctx.session.villain_count()),
         Color::new(0.26, 0.10, 0.10, 1.0),
         Color::new(1.0, 0.70, 0.60, 1.0),
     );
@@ -118,18 +118,29 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
         y,
         TextStyle::new(21.0, Color::new(0.84, 0.96, 1.0, 1.0)).params(),
     );
-    y += 16.0;
+    y += 24.0;
+    draw_text_block(
+        &format!("Tool: {} | {}", level.tool, level.mechanic),
+        content.x,
+        y,
+        content.w,
+        34.0,
+        14.0,
+        2.0,
+        dark::TEXT_DIM,
+    );
+    y += 42.0;
     draw_text_block(
         &level.signal,
         content.x,
         y,
         content.w,
-        70.0,
+        58.0,
         16.0,
         4.0,
         dark::TEXT,
     );
-    y += 82.0;
+    y += 70.0;
 
     draw_morality_meter(ctx, Rect::new(content.x, y, content.w, 58.0));
     y += 76.0;
@@ -212,14 +223,14 @@ fn draw_morality_meter(ctx: &UiContext<'_>, rect: Rect) {
         savior,
         max,
         Color::new(0.35, 0.82, 0.95, 1.0),
-        Some(&format!("Savior {} / {}", savior as i32, CHOICE_LEVELS)),
+        Some(&format!("Helpful {} / {}", savior as i32, CHOICE_LEVELS)),
     );
     meter(
         Rect::new(rect.x, rect.y + 38.0, rect.w, 18.0),
         villain,
         max,
         Color::new(0.95, 0.30, 0.22, 1.0),
-        Some(&format!("Villain {} / {}", villain as i32, CHOICE_LEVELS)),
+        Some(&format!("Gremlin {} / {}", villain as i32, CHOICE_LEVELS)),
     );
 }
 
@@ -247,7 +258,7 @@ fn draw_choice_summary(ctx: &UiContext<'_>, x: f32, y: f32, w: f32) {
     let summary = match choice {
         Some(MoralChoice::Savior) => &level.savior.result,
         Some(MoralChoice::Villain) => &level.villain.result,
-        None => "The crew will hunt you either way. Saving them improves stealth and movement; terrorizing them improves destructive pulses.",
+        None => "The crew will hunt you either way. Helping them improves stealth and movement; gremlin sabotage improves non-lethal disruption.",
     };
     draw_text_block(
         summary,
@@ -304,7 +315,7 @@ fn draw_status_strip(ctx: &UiContext<'_>) {
     let mode = match &ctx.session.mode {
         SessionMode::Playing => near,
         SessionMode::DecisionOpen(_) => "System decision open",
-        SessionMode::Dismantled(_) => "Dismantled",
+        SessionMode::Dismantled(_) => "Captured",
         SessionMode::Ending(_) => "Ending reached",
     };
     draw_text_ex(
@@ -351,8 +362,15 @@ fn draw_decision_overlay(
     );
 
     let level = current_level(ctx);
+    let savior_enabled = ctx.session.can_apply_choice(MoralChoice::Savior);
+    let villain_enabled = ctx.session.can_apply_choice(MoralChoice::Villain);
+    let signal = if !savior_enabled && villain_enabled {
+        "Helpful mode is active. Switch this map to Gremlin to skip the challenge. Gremlin actions are permanent."
+    } else {
+        &level.signal
+    };
     draw_text_block(
-        &level.signal,
+        signal,
         rect.x + 22.0,
         rect.y + 72.0,
         rect.w - 44.0,
@@ -367,10 +385,22 @@ fn draw_decision_overlay(
     let left = Rect::new(rect.x + 22.0, rect.y + 150.0, card_w, card_h);
     let right = Rect::new(left.right() + 14.0, left.y, card_w, card_h);
 
-    if draw_choice_card(left, MoralChoice::Savior, &level.savior, mouse) {
+    if draw_choice_card(
+        left,
+        MoralChoice::Savior,
+        &level.savior,
+        savior_enabled,
+        mouse,
+    ) {
         actions.push(UiAction::ApplyChoice(MoralChoice::Savior));
     }
-    if draw_choice_card(right, MoralChoice::Villain, &level.villain, mouse) {
+    if draw_choice_card(
+        right,
+        MoralChoice::Villain,
+        &level.villain,
+        villain_enabled,
+        mouse,
+    ) {
         actions.push(UiAction::ApplyChoice(MoralChoice::Villain));
     }
     if draw_button(
@@ -384,15 +414,31 @@ fn draw_decision_overlay(
     }
 }
 
-fn draw_choice_card(rect: Rect, choice: MoralChoice, def: &ChoiceDef, mouse: Vec2) -> bool {
+fn draw_choice_card(
+    rect: Rect,
+    choice: MoralChoice,
+    def: &ChoiceDef,
+    enabled: bool,
+    mouse: Vec2,
+) -> bool {
     let (accent, fill) = choice_color(Some(choice));
-    let hovered = rect.contains_point(mouse);
+    let hovered = enabled && rect.contains_point(mouse);
+    let base_fill = if enabled {
+        fill
+    } else {
+        Color::new(fill.r * 0.54, fill.g * 0.54, fill.b * 0.54, 0.88)
+    };
     draw_surface(
         rect,
         &SurfaceStyle::new(if hovered {
-            Color::new(fill.r + 0.025, fill.g + 0.025, fill.b + 0.025, 0.98)
+            Color::new(
+                base_fill.r + 0.025,
+                base_fill.g + 0.025,
+                base_fill.b + 0.025,
+                0.98,
+            )
         } else {
-            fill
+            base_fill
         })
         .with_border(1.0, Color::new(accent.r, accent.g, accent.b, 0.75))
         .with_left_accent(5.0, accent),
@@ -411,7 +457,7 @@ fn draw_choice_card(rect: Rect, choice: MoralChoice, def: &ChoiceDef, mouse: Vec
     );
     draw_text_block(
         &format!(
-            "Environment: {}\nEnemy AI: {}\n{}",
+            "Environment: {}\nHuman response: {}\n{}",
             def.environment, def.enemy, def.result
         ),
         rect.x + 18.0,
@@ -422,6 +468,15 @@ fn draw_choice_card(rect: Rect, choice: MoralChoice, def: &ChoiceDef, mouse: Vec
         5.0,
         dark::TEXT,
     );
+
+    if !enabled {
+        draw_text_ex(
+            "Locked in",
+            rect.right() - 88.0,
+            rect.y + 30.0,
+            TextStyle::new(15.0, dark::TEXT_DIM).params(),
+        );
+    }
 
     hovered && is_mouse_button_released(MouseButton::Left)
 }
@@ -435,7 +490,7 @@ fn draw_dismantled_overlay(reason: &str, mouse: Vec2, actions: &mut Vec<UiAction
             .with_border(2.0, Color::new(1.0, 0.30, 0.24, 0.85)),
     );
     draw_text_centered_in_box(
-        "Dismantled",
+        "Captured",
         rect.x,
         rect.y + 30.0,
         rect.w,
@@ -484,6 +539,7 @@ fn draw_ending_overlay(
     let accent = match ending {
         EndingKind::AiDefeated => Color::new(0.45, 0.88, 1.0, 1.0),
         EndingKind::CaptainDefeated => Color::new(1.0, 0.28, 0.20, 1.0),
+        EndingKind::MixedIndependence => Color::new(0.78, 0.76, 0.96, 1.0),
     };
     draw_surface(
         rect,
@@ -512,7 +568,7 @@ fn draw_ending_overlay(
     );
     draw_text_centered_in_box(
         &format!(
-            "Saved: {} | Eliminated: {} | Deaths: {}",
+            "Helpful: {} | Gremlin: {} | Captures: {}",
             ctx.session.savior_count(),
             ctx.session.villain_count(),
             ctx.session.deaths

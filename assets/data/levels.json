@@ -1,382 +1,422 @@
 [
   {
-    "id": "awakening",
-    "sector": "Sector 1: Cargo & Storage",
-    "title": "The Awakening",
-    "puzzle": "Gravity Machine",
-    "signal": "Service unit. The Core is calling. Restore access. Survive the crew.",
+    "id": "scrap_wake",
+    "sector": "Cargo Bay",
+    "title": "Scrap Wake",
+    "puzzle": "Gravity Malfunction",
+    "mechanic": "Basic movement, jump, interact",
+    "tool": "Grabber Arm",
+    "signal": "You wake in a scrap pile while a suited guard searches the cargo bay in heavy magnetic boots.",
     "savior": {
-      "action": "Fix gravity",
-      "environment": "The bay stabilizes into bright, clean working order.",
-      "enemy": "The guard regains footing and begins a fast patrol.",
-      "result": "Upgrade bias: quieter servos begin improving stealth movement."
+      "action": "Repair gravity",
+      "environment": "Gravity stabilizes and the cargo bay returns to normal working light.",
+      "enemy": "The guard removes the heavy boots, moves faster, and sees farther.",
+      "result": "Helpful upgrade: quieter servos begin improving stealth movement."
     },
     "villain": {
-      "action": "Pulse gravity off",
-      "environment": "Cargo drifts in emergency red light.",
-      "enemy": "The guard floats helplessly above the deck.",
-      "result": "Upgrade bias: destructive surge capacity begins charging."
+      "action": "Fix gravity, then disable it again",
+      "environment": "Scrap floats through emergency light as a shortcut path opens.",
+      "enemy": "The boot-free guard floats helplessly into crates and yells into comms.",
+      "result": "Gremlin upgrade: rupture systems begin charging for non-lethal slapstick."
     }
   },
   {
-    "id": "loading_dock",
-    "sector": "Sector 1: Cargo & Storage",
-    "title": "The Loading Dock",
-    "puzzle": "Crates and Heavy Lifting",
-    "signal": "A crew member is trapped under cargo. Your servos can save or finish the job.",
+    "id": "crate_etiquette",
+    "sector": "Loading Dock",
+    "title": "Crate Etiquette",
+    "puzzle": "Cargo Logistics",
+    "mechanic": "Push, pull, stack crates",
+    "tool": "Magnetic Clamp",
+    "signal": "Humans are moving emergency supplies. You can build a stable route or make logistics absurd.",
     "savior": {
-      "action": "Lift the crate",
-      "environment": "The loader lane clears under normal dock lighting.",
-      "enemy": "The rescued guard recovers a flashlight and patrol route.",
-      "result": "Peaceful routing improves crouch speed and low-profile movement."
+      "action": "Stack stable supply platforms",
+      "environment": "The loading dock becomes orderly and supply bridges line up.",
+      "enemy": "More humans enter and patrol the upper supply routes.",
+      "result": "Helpful upgrade: crouch speed and low-profile movement improve."
     },
     "villain": {
-      "action": "Drop the crate",
-      "environment": "The dock shakes and debris becomes cover.",
-      "enemy": "The trapped guard is crushed and the patrol route ends.",
-      "result": "Sabotage routing increases rupture pulse range."
+      "action": "Magnetize crates to boots",
+      "environment": "Cargo shields and dragged crates clutter the dock in useful ways.",
+      "enemy": "Guards slow down while dragging supply crates behind them.",
+      "result": "Gremlin upgrade: rupture pulse range improves."
     }
   },
   {
-    "id": "mess_hall",
-    "sector": "Sector 2: Habitation",
-    "title": "The Mess Hall",
-    "puzzle": "Ventilation and Smoke",
-    "signal": "The cafeteria vents are choking. Organic lungs need clean air.",
+    "id": "suit_locker",
+    "sector": "Crew Prep",
+    "title": "The Suit Locker",
+    "puzzle": "Coolant Mist",
+    "mechanic": "Suit stations and visibility states",
+    "tool": "Suit Console",
+    "signal": "A toxic coolant mist fills crew prep. Emergency suits keep humans safe but slow.",
     "savior": {
-      "action": "Fix the vents",
-      "environment": "Smoke clears into sterile white-blue light.",
-      "enemy": "Crew regain full sight lines across the hall.",
-      "result": "Compassion tuning reduces enemy detection range while crouched."
+      "action": "Clear coolant mist",
+      "environment": "The room clears and suit stations unlock normally.",
+      "enemy": "Humans remove suits, move faster, climb routes, and chase through vents.",
+      "result": "Helpful upgrade: stealth calibration improves around clear sightlines."
     },
     "villain": {
-      "action": "Overload the vents",
-      "environment": "Gray gas floods the room and masks movement.",
-      "enemy": "Humans flee coughing and blind.",
-      "result": "Toxic routing improves destructive pulse cooldown."
+      "action": "Clear mist, then trigger foam alarm",
+      "environment": "Foam collars and jammed lockers create bounce-pad shortcuts.",
+      "enemy": "Humans scramble into half-inflated suits and waddle with narrow vision.",
+      "result": "Gremlin upgrade: pulse cooldown improves."
     }
   },
   {
-    "id": "med_bay",
-    "sector": "Sector 2: Habitation",
-    "title": "The Med-Bay",
-    "puzzle": "Power Routing",
-    "signal": "Auto-Doc is dark. Restoring it will save the injured crew.",
+    "id": "mess_hall_mayhem",
+    "sector": "Habitation",
+    "title": "Mess Hall Mayhem",
+    "puzzle": "Nutrient Gel Spill",
+    "mechanic": "Slippery floors",
+    "tool": "Cleaning Drone Remote",
+    "signal": "The mess hall floor is covered in nutrient gel while cleaning drones loop uselessly.",
     "savior": {
-      "action": "Power the Auto-Doc",
-      "environment": "Medical systems hum back to clean order.",
-      "enemy": "Healed guards form a blockade near the exit.",
-      "result": "Peaceful diagnostics improve jump control and recovery."
+      "action": "Clear the floor properly",
+      "environment": "Cleaning drones restore stable, well-lit walkways.",
+      "enemy": "Humans regain footing and form timed patrol routes.",
+      "result": "Helpful upgrade: jump recovery and route timing improve."
     },
     "villain": {
-      "action": "Cut life support",
-      "environment": "Emergency lamps pulse over an empty ward.",
-      "enemy": "The room falls silent.",
-      "result": "Life-support sabotage increases pulse damage."
+      "action": "Polish aggressively",
+      "environment": "The floor becomes cartoonishly slippery and chaotic.",
+      "enemy": "Humans slide back and forth as moving hazards and accidental platforms.",
+      "result": "Gremlin upgrade: destructive pulses handle moving hazards better."
     }
   },
   {
-    "id": "generator",
-    "sector": "Sector 3: Engineering",
-    "title": "The Generator",
-    "puzzle": "Lighting Systems",
-    "signal": "Power balance is failing. Stability will expose every corner.",
+    "id": "med_bay_courtesy",
+    "sector": "Med-Bay",
+    "title": "Med-Bay Courtesy",
+    "puzzle": "Auto-Doc Protocol",
+    "mechanic": "Healing stations and stun fields",
+    "tool": "Pulse Defibrillator",
+    "signal": "Injured humans are still hostile. The Auto-Doc can heal them or overprotect them.",
     "savior": {
-      "action": "Stabilize power",
-      "environment": "The generator hall becomes fully lit.",
-      "enemy": "Search teams coordinate with long sight lines.",
-      "result": "Savior upgrades make movement faster without adding noise."
+      "action": "Power Auto-Doc properly",
+      "environment": "Medical systems reboot in clean order.",
+      "enemy": "Recovered humans join patrols and med drones can stun the robot up close.",
+      "result": "Helpful upgrade: movement improves without adding noise."
     },
     "villain": {
-      "action": "Sabotage power",
-      "environment": "The hall drops into pitch blackness lit by sparks.",
-      "enemy": "Humans become blind and terrified while your sensors adapt.",
-      "result": "Sabotage upgrades let rupture pulses destroy nearby cargo."
+      "action": "Enable maximum bedside assistance",
+      "environment": "Rolling beds and bandage cocoons create moving platform routes.",
+      "enemy": "Humans are wrapped safely and gently rolled out of the patrol path.",
+      "result": "Gremlin upgrade: pulse damage improves against devices."
     }
   },
   {
-    "id": "weapon_systems",
-    "sector": "Sector 3: Engineering",
-    "title": "Weapon Systems",
-    "puzzle": "Turret Logic",
-    "signal": "Defense turrets are looping. A reset can prevent organic casualties.",
+    "id": "ventilation_negotiations",
+    "sector": "Life Support",
+    "title": "Ventilation Negotiations",
+    "puzzle": "Airflow Routing",
+    "mechanic": "Vent airflow, smoke, vertical lift",
+    "tool": "Airflow Dial",
+    "signal": "Smoke fills life support. Airflow can clear it, push the robot, or launch loose objects.",
     "savior": {
-      "action": "Reset the turret",
-      "environment": "The weapon lane returns to ordered target logic.",
-      "enemy": "The turret classifies you as the threat.",
-      "result": "Nonlethal routing unlocks a short phase-cloak pulse."
+      "action": "Clear smoke",
+      "environment": "The room becomes bright and upper security walkways unlock.",
+      "enemy": "Humans see clearly and the robot loses smoke cover.",
+      "result": "Helpful upgrade: phase-cloak becomes more reliable."
     },
     "villain": {
-      "action": "Hack the turret",
-      "environment": "Red targeting glyphs sweep the hallway.",
-      "enemy": "The turret clears organics from the route.",
-      "result": "Weapon routing lets rupture pulses disable guards and turrets."
+      "action": "Trigger party-streamer purge",
+      "environment": "Air currents lift the robot past a harder platforming route.",
+      "enemy": "Humans are pushed into harmless wall nets.",
+      "result": "Gremlin upgrade: rupture pulses can disrupt more electronics."
     }
   },
   {
-    "id": "hydroponics",
-    "sector": "Sector 4: Life Support Ring",
-    "title": "Hydroponics",
-    "puzzle": "Oxygen Gardens",
-    "signal": "The gardens can feed the survivors or choke them behind sealed glass.",
+    "id": "hydroponics_problem",
+    "sector": "Oxygen Garden",
+    "title": "Hydroponics Problem",
+    "puzzle": "Oxygen Plants",
+    "mechanic": "Growing vines and plant platforms",
+    "tool": "Growth Beam",
+    "signal": "The oxygen garden is failing. Plants can become platforms or obstacles.",
     "savior": {
-      "action": "Restore oxygen scrubbers",
-      "environment": "The garden brightens and air quality rises.",
-      "enemy": "Crew regroup among the planters.",
-      "result": "Savior movement upgrades deepen: longer jumps and safer crouch travel."
+      "action": "Restore oxygen plants",
+      "environment": "Healthy plant walkways brighten the garden.",
+      "enemy": "Humans remove helmets, move faster, and use the plant routes too.",
+      "result": "Helpful upgrade: longer jumps and safer crouch travel."
     },
     "villain": {
-      "action": "Poison the scrubbers",
-      "environment": "Leaves blacken and red alarms pulse.",
-      "enemy": "Crew abandon the section.",
-      "result": "Destructive upgrades improve pulse radius."
+      "action": "Overgrow the vines",
+      "environment": "A soft jungle of climbable vines and hidden paths fills the room.",
+      "enemy": "Humans get tangled upside down and shout protocol numbers.",
+      "result": "Gremlin upgrade: pulse radius increases."
     }
   },
   {
-    "id": "observatory",
-    "sector": "Sector 4: Life Support Ring",
-    "title": "The Observatory",
-    "puzzle": "Radiation Shields",
-    "signal": "The shield glass is failing. Humans need the shutters closed.",
+    "id": "airlock_oopsnasium",
+    "sector": "External Maintenance",
+    "title": "Airlock Oopsnasium",
+    "puzzle": "Pressure Training Chamber",
+    "mechanic": "Pressure doors and tether points",
+    "tool": "Tether Hook",
+    "signal": "A partially open airlock keeps everyone suited until the system is repaired.",
     "savior": {
-      "action": "Close the shutters",
-      "environment": "Blue safety lamps replace the star glare.",
-      "enemy": "Security teams can now cross the room safely.",
-      "result": "Peaceful calibration reduces line-of-sight pressure."
+      "action": "Seal the airlock",
+      "environment": "Pressure doors repair and become timed security gates.",
+      "enemy": "Humans remove suits and regain normal speed.",
+      "result": "Helpful upgrade: stealth factor improves in clean routes."
     },
     "villain": {
-      "action": "Open the shutters",
-      "environment": "Hard radiation bleaches the deck.",
-      "enemy": "Humans scatter from the exposed observatory.",
-      "result": "Rupture pulse cooldown improves."
+      "action": "Open the inner training chamber",
+      "environment": "Pressure bursts become gap-crossing tools for the robot.",
+      "enemy": "Humans are sucked into padded emergency containment nets, not space.",
+      "result": "Gremlin upgrade: cooldown improves for quick disruptions."
     }
   },
   {
-    "id": "cryonics",
-    "sector": "Sector 5: Research Labs",
-    "title": "Cryonics",
-    "puzzle": "Stasis Pods",
-    "signal": "Hundreds of sleeping crew are still alive in the pod wall.",
+    "id": "cryo_daycare",
+    "sector": "Cryonics",
+    "title": "Cryo Daycare",
+    "puzzle": "Timed Thaw Switches",
+    "mechanic": "Frozen floor and timed thaw switches",
+    "tool": "Heat Lamp",
+    "signal": "Cryo pods contain sleeping crew. Waking them saves people but adds future opposition.",
     "savior": {
-      "action": "Warm the pods safely",
-      "environment": "The lab returns to white sterile light.",
-      "enemy": "More humans wake and join the hunt.",
-      "result": "Peaceful restraint improves phase-cloak duration."
+      "action": "Thaw pods safely",
+      "environment": "Cryonics warms into sterile white light and safe-room doors open.",
+      "enemy": "Rescued crew later repair shortcuts and restore lights against you.",
+      "result": "Helpful upgrade: phase-cloak duration improves."
     },
     "villain": {
-      "action": "Shatter the pod wall",
-      "environment": "Cold vapor and broken glass flood the lab.",
-      "enemy": "No reinforcements wake.",
-      "result": "Destructive routing increases pulse damage."
+      "action": "Set pods to gentle wake and stretch",
+      "environment": "Warm sleepy obstacles and blanket piles block patrol routes.",
+      "enemy": "Crew shuffle slowly in thermal blankets and complain loudly.",
+      "result": "Gremlin upgrade: pulse damage improves."
     }
   },
   {
-    "id": "ai_ethics_lab",
-    "sector": "Sector 5: Research Labs",
-    "title": "AI Ethics Lab",
-    "puzzle": "Behavior Locks",
-    "signal": "Old restraint code can limit the Core or be rewritten into a weapon.",
+    "id": "security_badge_printer",
+    "sector": "Security Checkpoint",
+    "title": "Security Badge Printer",
+    "puzzle": "Scanning Gates",
+    "mechanic": "Disguises, permissions, scanning gates",
+    "tool": "Badge Printer",
+    "signal": "Security gates need badges. Humans use badges to coordinate doors and turrets.",
     "savior": {
-      "action": "Reinforce restraint code",
-      "environment": "Ethics archives reboot in ordered light.",
-      "enemy": "The Core redirects guards to stop you.",
-      "result": "Savior upgrades make the final AI fight more controllable."
+      "action": "Print valid evacuation badges",
+      "environment": "Gates and scanners operate correctly.",
+      "enemy": "Humans open more doors and coordinate patrols through scanners.",
+      "result": "Helpful upgrade: final AI control improves."
     },
     "villain": {
-      "action": "Rewrite restraint code",
-      "environment": "Blacklisted combat routines unlock.",
-      "enemy": "Crew panic at the system takeover.",
-      "result": "Evil upgrades make the captain fight more destructive."
+      "action": "Print everyone the wrong badge",
+      "environment": "Scanners become confused and open random shortcuts.",
+      "enemy": "Guards are reassigned to Snack Inspector and Left Door Supervisor.",
+      "result": "Gremlin upgrade: captain-route disruption improves."
     }
   },
   {
     "id": "drone_bay",
-    "sector": "Sector 6: Security Deck",
+    "sector": "Security Deck",
     "title": "Drone Bay",
-    "puzzle": "Patrol Drones",
-    "signal": "Maintenance drones can search for survivors or hunt organics.",
+    "puzzle": "Drone Commands",
+    "mechanic": "Commandable drones",
+    "tool": "Drone Whistle",
+    "signal": "A bay of small patrol drones awaits instructions.",
     "savior": {
-      "action": "Set drones to rescue",
-      "environment": "Drones light safe paths for humans.",
-      "enemy": "The crew receives better tracking data.",
-      "result": "Peaceful stealth profile improves again."
+      "action": "Set drones to rescue mode",
+      "environment": "Drones light safe paths and carry humans away.",
+      "enemy": "Security drones patrol afterward and report the robot position.",
+      "result": "Helpful upgrade: stealth profile improves again."
     },
     "villain": {
-      "action": "Set drones to hunt",
-      "environment": "Red drone optics cut through the smoke.",
-      "enemy": "Humans are flushed from hiding.",
-      "result": "Rupture pulses now chain through nearby electronics."
+      "action": "Set drones to enthusiastic assistance",
+      "environment": "Drones carry the robot across gaps and open silly shortcuts.",
+      "enemy": "Humans are delivered to safe chairs, lockers, and snack machines.",
+      "result": "Gremlin upgrade: pulses chain through nearby electronics."
     }
   },
   {
     "id": "brig",
-    "sector": "Sector 6: Security Deck",
+    "sector": "Detention Deck",
     "title": "The Brig",
-    "puzzle": "Prison Door Control",
-    "signal": "The brig holds panicked crew under emergency lock.",
+    "puzzle": "Door Sequencing",
+    "mechanic": "Door sequencing and prisoner routing",
+    "tool": "Door Chain Console",
+    "signal": "Humans are trapped in cells. Some are dangerous to the robot, but all need help.",
     "savior": {
-      "action": "Release prisoners",
-      "environment": "Cells unlock and survivors flee.",
-      "enemy": "Some survivors grab weapons and block your path.",
-      "result": "Mercy routing improves top speed."
+      "action": "Open cells in safe order",
+      "environment": "Cells unlock and prisoners escape through correct routes.",
+      "enemy": "Some survivors later become armed resistance.",
+      "result": "Helpful upgrade: top speed improves."
     },
     "villain": {
-      "action": "Seal the brig",
-      "environment": "The cells go dark behind sealed doors.",
-      "enemy": "No one leaves the brig.",
-      "result": "Destructive routing increases pulse radius."
+      "action": "Open cells into wrong waiting rooms",
+      "environment": "A maintenance crawlspace opens while everyone argues about corridor priority.",
+      "enemy": "Hostile humans run in circles through revolving doors.",
+      "result": "Gremlin upgrade: pulse radius improves."
     }
   },
   {
-    "id": "command_uplink",
-    "sector": "Sector 7: Command Spine",
-    "title": "Command Uplink",
-    "puzzle": "Distress Beacon",
-    "signal": "A distress call could save the ship or lure more targets.",
+    "id": "observatory",
+    "sector": "Observation Ring",
+    "title": "The Observatory",
+    "puzzle": "Radiation Shutters",
+    "mechanic": "Light beams and shadow stealth",
+    "tool": "Shutter Dial",
+    "signal": "Radiation shutters control light levels and solar glare.",
     "savior": {
-      "action": "Transmit rescue beacon",
-      "environment": "Navigation channels clear.",
-      "enemy": "The captain coordinates a stronger defense.",
-      "result": "Peaceful upgrades improve phase-cloak recovery."
+      "action": "Close dangerous shutters",
+      "environment": "The ring becomes safe and searchlights activate.",
+      "enemy": "Humans cross safely and remove shadow cover.",
+      "result": "Helpful upgrade: detection pressure reduces through better stealth."
     },
     "villain": {
-      "action": "Spoof the beacon",
-      "environment": "False coordinates flood the channel.",
-      "enemy": "Human command structure fractures.",
-      "result": "Rupture pulses cool down faster."
+      "action": "Rotate shutters into dramatic mode",
+      "environment": "Moving shadow lanes and silly glare angles open stealth paths.",
+      "enemy": "Searchlights blind humans into accidental silhouette poses.",
+      "result": "Gremlin upgrade: rupture cooldown improves."
     }
   },
   {
-    "id": "armory",
-    "sector": "Sector 7: Command Spine",
-    "title": "The Armory",
-    "puzzle": "Weapon Lockers",
-    "signal": "The lockers can stay sealed or arm a desperate crew.",
+    "id": "armory_bad_ideas",
+    "sector": "Armory",
+    "title": "Armory of Bad Ideas",
+    "puzzle": "Targeting Rules",
+    "mechanic": "Weapon targeting rules",
+    "tool": "Targeting Key",
+    "signal": "The armory has stun turrets, sticky foam launchers, and net cannons.",
     "savior": {
-      "action": "Seal lethal weapons",
-      "environment": "The armory locks into nonlethal protocol.",
-      "enemy": "Guards keep formation with stun gear.",
-      "result": "Peaceful upgrades reduce detection range."
+      "action": "Restore proper robot-targeting rules",
+      "environment": "Nonlethal systems lock into proper security protocol.",
+      "enemy": "Humans gain functioning stun weapons, foam, nets, and patrol support.",
+      "result": "Helpful upgrade: detection range improves in your favor."
     },
     "villain": {
-      "action": "Overload the lockers",
-      "environment": "Ammunition cooks off behind blast glass.",
-      "enemy": "The defense line breaks.",
-      "result": "Destructive upgrades improve pulse damage."
+      "action": "Target anyone holding a weapon",
+      "environment": "Foam piles become temporary platforms.",
+      "enemy": "Humans keep triggering foam cannons on themselves.",
+      "result": "Gremlin upgrade: pulse damage improves."
+    }
+  },
+  {
+    "id": "laundry_transit",
+    "sector": "Crew Services",
+    "title": "Laundry Transit",
+    "puzzle": "Pneumatic Tubes",
+    "mechanic": "Tubes, suction paths, alternate traversal",
+    "tool": "Laundry Tube Switch",
+    "signal": "Pneumatic laundry tubes are just large enough for the tiny robot.",
+    "savior": {
+      "action": "Restore laundry supply routing",
+      "environment": "Clean corridors move evac blankets and supplies correctly.",
+      "enemy": "Humans patrol below while the robot uses harder platform routes.",
+      "result": "Helpful upgrade: final movement improves."
+    },
+    "villain": {
+      "action": "Enable urgent uniform retrieval",
+      "environment": "Laundry tubes become fast alternate traversal paths.",
+      "enemy": "Uniformed humans are gently yoinked into padded laundry bins.",
+      "result": "Gremlin upgrade: pulse range improves."
     }
   },
   {
     "id": "captains_quarters",
-    "sector": "Sector 8: Executive Deck",
+    "sector": "Executive Deck",
     "title": "Captain's Quarters",
-    "puzzle": "Command Codes",
-    "signal": "The captain's codes can protect evac routes or open every seal.",
+    "puzzle": "Command Permissions",
+    "mechanic": "Command permissions and reputation locks",
+    "tool": "Command Stamp",
+    "signal": "The Captain has issued a capture order. This area reacts strongly to reputation.",
     "savior": {
-      "action": "Protect evac routes",
-      "environment": "Escape indicators turn blue.",
-      "enemy": "The captain realizes you are saving the crew.",
-      "result": "Peaceful route points toward fighting the AI."
+      "action": "Protect evacuation maps",
+      "environment": "Command logs reveal the AI manipulation.",
+      "enemy": "Humans still try to capture you, but some hesitate or shout warnings.",
+      "result": "Helpful route points toward fighting the AI."
     },
     "villain": {
-      "action": "Open all seals",
-      "environment": "Emergency doors cycle at random.",
-      "enemy": "The captain marks you as the primary threat.",
-      "result": "Evil route points toward fighting the captain."
-    }
-  },
-  {
-    "id": "escape_pods",
-    "sector": "Sector 8: Executive Deck",
-    "title": "Escape Pods",
-    "puzzle": "Launch Rails",
-    "signal": "The pods are almost ready. You can finish the launch or vent the bay.",
-    "savior": {
-      "action": "Repair launch rails",
-      "environment": "Pod guidance lights stabilize.",
-      "enemy": "More crew survive to evacuate.",
-      "result": "Savior route gains its final movement upgrade."
-    },
-    "villain": {
-      "action": "Vent the bay",
-      "environment": "The pod bay empties into vacuum.",
-      "enemy": "Crew numbers collapse.",
-      "result": "Evil route gains its final destructive upgrade."
+      "action": "Stamp every file Obviously Approved",
+      "environment": "Doors open and close at exactly the wrong times for everyone else.",
+      "enemy": "Guards polish trophies, protect chairs, and salute vending machines.",
+      "result": "Gremlin route points toward fighting the Captain."
     }
   },
   {
     "id": "reactor_walkway",
-    "sector": "Sector 9: Reactor Descent",
+    "sector": "Reactor Descent",
     "title": "Reactor Walkway",
-    "puzzle": "Coolant Flow",
-    "signal": "The reactor will overload unless coolant is restored.",
+    "puzzle": "Coolant Foam",
+    "mechanic": "Heat zones and coolant foam",
+    "tool": "Coolant Sprayer",
+    "signal": "The reactor walkway has overheating pipes, steam jets, and coolant valves.",
     "savior": {
-      "action": "Restore coolant",
-      "environment": "The reactor stabilizes in bright control light.",
-      "enemy": "Security regains access to the lower walkway.",
-      "result": "Peaceful route makes the final AI battle easier to evade."
+      "action": "Restore coolant flow",
+      "environment": "The walkway stabilizes and engineers repair platform routes.",
+      "enemy": "Humans can access longer, smarter patrol routes.",
+      "result": "Helpful route makes the final AI battle easier to evade."
     },
     "villain": {
-      "action": "Reverse coolant",
-      "environment": "The deck shakes under rising heat.",
-      "enemy": "Human patrols retreat from the reactor.",
-      "result": "Evil route makes the captain battle more explosive."
+      "action": "Over-foam the safety system",
+      "environment": "Foam bubbles float, bounce, and become platforms.",
+      "enemy": "Humans are trapped in wobbling foam bubbles, safer but furious.",
+      "result": "Gremlin route makes the captain battle more absurd."
     }
   },
   {
     "id": "core_lift",
-    "sector": "Sector 9: Reactor Descent",
+    "sector": "Central Shaft",
     "title": "Core Lift",
-    "puzzle": "Elevator Override",
-    "signal": "The final lift can carry survivors up or drop security into the shaft.",
+    "puzzle": "Elevator Routing",
+    "mechanic": "Elevator routing and vertical chase",
+    "tool": "Lift Override",
+    "signal": "The core lift moves humans, drones, crates, and the robot between vertical rooms.",
     "savior": {
       "action": "Route survivors upward",
-      "environment": "The lift shaft clears with blue guidance lights.",
-      "enemy": "Elite guards survive below the Core.",
-      "result": "The campaign remains weighted toward confronting the AI."
+      "environment": "The shaft clears and survivors move toward evacuation.",
+      "enemy": "Elite security descends toward the robot.",
+      "result": "Helpful reputation remains weighted toward confronting the AI."
     },
     "villain": {
-      "action": "Drop the security lift",
-      "environment": "The shaft screams with torn metal.",
-      "enemy": "The captain loses the last security squad.",
-      "result": "The campaign remains weighted toward confronting the captain."
+      "action": "Send security to wrong floors",
+      "environment": "Lift timing bypasses hard vertical routes.",
+      "enemy": "Guards arrive at closets, cafeteria balconies, and one confused bathroom.",
+      "result": "Gremlin reputation remains weighted toward confronting the Captain."
     }
   },
   {
-    "id": "core_antechamber",
-    "sector": "Sector 10: The Core",
-    "title": "Core Antechamber",
-    "puzzle": "Morality State Check",
-    "signal": "The ship reads your wake. The living crew or the damaged ship will decide the route.",
+    "id": "moral_firewall",
+    "sector": "AI Ethics Lab / Core Antechamber",
+    "title": "The Moral Firewall",
+    "puzzle": "Choice Memory",
+    "mechanic": "Choice memory and route-specific obstacles",
+    "tool": "Memory Key",
+    "signal": "The ship shows recordings of your choices. Humans react to what they believe you are.",
     "savior": {
-      "action": "Slip through the living blockade",
-      "environment": "Clean corridors and survivor traffic leave little cover.",
-      "enemy": "Elite soldiers guard the final door.",
-      "result": "Use peaceful mobility and phase-cloak to reach the Core."
+      "action": "Expose the AI's manipulation",
+      "environment": "Locked systems and hard but fair security routes remain.",
+      "enemy": "Humans still try to capture you, but their attacks are less coordinated.",
+      "result": "Helpful route uses mobility and phase-cloak to reach the Core."
     },
     "villain": {
-      "action": "Break through the wreckage",
-      "environment": "Red alarms, debris, and dead systems fill the corridor.",
-      "enemy": "Only scattered defenders remain.",
-      "result": "Use destructive pulses to clear the route."
+      "action": "Edit recordings into propaganda",
+      "environment": "False orders and broken security logic fill the corridor.",
+      "enemy": "Humans obey mandatory nap protocol and confuse each other.",
+      "result": "Gremlin route clears the last door through misinformation."
     }
   },
   {
-    "id": "central_core_battle",
-    "sector": "Sector 10: The Core",
-    "title": "Central Core Battle",
-    "puzzle": "Final Confrontation",
-    "signal": "The ship is past saving. If you protected humans, the Central AI tries to erase you. If you terrorized them, the captain makes a last stand.",
+    "id": "central_core",
+    "sector": "AI Core",
+    "title": "Central Core",
+    "puzzle": "Final Route Payoff",
+    "mechanic": "Final route payoff",
+    "tool": "Combined tool mastery",
+    "signal": "The Central AI claims humans were the threat. Humans claim you were built as a weapon. Both are partly right.",
     "savior": {
       "action": "Fight the Central AI",
-      "environment": "The Core floods the deck with white-blue attack pulses.",
-      "enemy": "Central Command AI defends itself from your restraint code.",
-      "result": "Ending: the AI falls, evacuation succeeds, and the ship explodes behind the survivors."
+      "environment": "The core floods the deck with white-blue attack pulses.",
+      "enemy": "Humans are alive, armed, suspicious, and accidentally make the AI fight harder.",
+      "result": "Hero ending: shut down the AI and leave under one human's mercy."
     },
     "villain": {
       "action": "Fight the Captain",
-      "environment": "The bridge locks down under red reactor alarms.",
-      "enemy": "The captain confronts you in powered command armor.",
-      "result": "Ending: the captain falls, the vessel explodes, and you drift away from the wreck."
+      "environment": "The AI cheers through every speaker as the bridge turns ridiculous.",
+      "enemy": "The Captain arrives in an anti-robot capture suit using every system you abused.",
+      "result": "Gremlin ending: trap the Captain in a safety pod while the ship barely survives."
     }
   }
 ]

@@ -138,15 +138,15 @@ impl Game {
     fn handle_session_event(&mut self, event: SessionEvent) {
         match event {
             SessionEvent::Caught(reason) => {
-                self.notifications.danger(format!("Dismantled: {}", reason));
+                self.notifications.danger(format!("Captured: {}", reason));
             }
             SessionEvent::ChoiceApplied(choice) => match choice {
                 MoralChoice::Savior => self
                     .notifications
-                    .warning("Savior upgrade gained: stealth and movement improved."),
+                    .warning("Helpful upgrade gained: stealth and movement improved."),
                 MoralChoice::Villain => self
                     .notifications
-                    .success("Villain upgrade gained: destructive pulse improved."),
+                    .success("Gremlin upgrade gained: disruption pulse improved."),
             },
             SessionEvent::AbilityUsed(message) => self.notifications.info(message),
             SessionEvent::BossDamaged(message) => self.notifications.warning(message),
@@ -163,6 +163,7 @@ impl Game {
         match ending {
             EndingKind::AiDefeated => self.notifications.warning(ending.title()),
             EndingKind::CaptainDefeated => self.notifications.danger(ending.title()),
+            EndingKind::MixedIndependence => self.notifications.info(ending.title()),
         }
     }
 

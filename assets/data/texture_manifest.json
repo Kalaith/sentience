@@ -33,5 +33,105 @@
     "key": "crate",
     "path": "assets/images/crate.png",
     "filter": "linear"
+  },
+  {
+    "key": "map_scrap_wake",
+    "path": "assets/images/maps/scrap_wake.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_crate_etiquette",
+    "path": "assets/images/maps/crate_etiquette.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_suit_locker",
+    "path": "assets/images/maps/suit_locker.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_mess_hall_mayhem",
+    "path": "assets/images/maps/mess_hall_mayhem.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_med_bay_courtesy",
+    "path": "assets/images/maps/med_bay_courtesy.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_ventilation_negotiations",
+    "path": "assets/images/maps/ventilation_negotiations.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_hydroponics_problem",
+    "path": "assets/images/maps/hydroponics_problem.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_airlock_oopsnasium",
+    "path": "assets/images/maps/airlock_oopsnasium.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_cryo_daycare",
+    "path": "assets/images/maps/cryo_daycare.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_security_badge_printer",
+    "path": "assets/images/maps/security_badge_printer.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_drone_bay",
+    "path": "assets/images/maps/drone_bay.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_brig",
+    "path": "assets/images/maps/brig.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_observatory",
+    "path": "assets/images/maps/observatory.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_armory_bad_ideas",
+    "path": "assets/images/maps/armory_bad_ideas.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_laundry_transit",
+    "path": "assets/images/maps/laundry_transit.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_captains_quarters",
+    "path": "assets/images/maps/captains_quarters.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_reactor_walkway",
+    "path": "assets/images/maps/reactor_walkway.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_core_lift",
+    "path": "assets/images/maps/core_lift.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_moral_firewall",
+    "path": "assets/images/maps/moral_firewall.png",
+    "filter": "linear"
+  },
+  {
+    "key": "map_central_core",
+    "path": "assets/images/maps/central_core.png",
+    "filter": "linear"
   }
 ]
