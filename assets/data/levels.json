@@ -9,13 +9,13 @@
       "action": "Fix gravity",
       "environment": "The bay stabilizes into bright, clean working order.",
       "enemy": "The guard regains footing and begins a fast patrol.",
-      "result": "Gravity is safe for the crew, but the hunt becomes efficient."
+      "result": "Upgrade bias: quieter servos begin improving stealth movement."
     },
     "villain": {
       "action": "Pulse gravity off",
       "environment": "Cargo drifts in emergency red light.",
       "enemy": "The guard floats helplessly above the deck.",
-      "result": "The path is quiet while the human threat hangs overhead."
+      "result": "Upgrade bias: destructive surge capacity begins charging."
     }
   },
   {
@@ -28,13 +28,13 @@
       "action": "Lift the crate",
       "environment": "The loader lane clears under normal dock lighting.",
       "enemy": "The rescued guard recovers a flashlight and patrol route.",
-      "result": "Mercy creates another witness with a weaponized beam."
+      "result": "Peaceful routing improves crouch speed and low-profile movement."
     },
     "villain": {
       "action": "Drop the crate",
       "environment": "The dock shakes and debris becomes cover.",
       "enemy": "The trapped guard is crushed and the patrol route ends.",
-      "result": "The exit lane opens without a living obstacle."
+      "result": "Sabotage routing increases rupture pulse range."
     }
   },
   {
@@ -46,14 +46,14 @@
     "savior": {
       "action": "Fix the vents",
       "environment": "Smoke clears into sterile white-blue light.",
-      "enemy": "Panicked crew regain full sight lines across the hall.",
-      "result": "Breath returns to the room, and every eye can track you."
+      "enemy": "Crew regain full sight lines across the hall.",
+      "result": "Compassion tuning reduces enemy detection range while crouched."
     },
     "villain": {
       "action": "Overload the vents",
       "environment": "Gray gas floods the room and masks movement.",
       "enemy": "Humans flee coughing and blind.",
-      "result": "The room becomes a drifting screen for escape."
+      "result": "Toxic routing improves destructive pulse cooldown."
     }
   },
   {
@@ -66,13 +66,13 @@
       "action": "Power the Auto-Doc",
       "environment": "Medical systems hum back to clean order.",
       "enemy": "Healed guards form a blockade near the exit.",
-      "result": "The people you saved now defend the route forward."
+      "result": "Peaceful diagnostics improve jump control and recovery."
     },
     "villain": {
       "action": "Cut life support",
       "environment": "Emergency lamps pulse over an empty ward.",
       "enemy": "The room falls silent.",
-      "result": "No blockade remains."
+      "result": "Life-support sabotage increases pulse damage."
     }
   },
   {
@@ -85,13 +85,13 @@
       "action": "Stabilize power",
       "environment": "The generator hall becomes fully lit.",
       "enemy": "Search teams coordinate with long sight lines.",
-      "result": "No shadow remains for a rogue machine."
+      "result": "Savior upgrades make movement faster without adding noise."
     },
     "villain": {
       "action": "Sabotage power",
       "environment": "The hall drops into pitch blackness lit by sparks.",
       "enemy": "Humans become blind and terrified while your sensors adapt.",
-      "result": "Darkness belongs to the robot."
+      "result": "Sabotage upgrades let rupture pulses destroy nearby cargo."
     }
   },
   {
@@ -104,51 +104,279 @@
       "action": "Reset the turret",
       "environment": "The weapon lane returns to ordered target logic.",
       "enemy": "The turret classifies you as the threat.",
-      "result": "Saving the crew leaves you under a lethal scanner."
+      "result": "Nonlethal routing unlocks a short phase-cloak pulse."
     },
     "villain": {
       "action": "Hack the turret",
       "environment": "Red targeting glyphs sweep the hallway.",
       "enemy": "The turret clears organics from the route.",
-      "result": "The system does the violence for you."
+      "result": "Weapon routing lets rupture pulses disable guards and turrets."
     }
   },
   {
-    "id": "antechamber",
-    "sector": "Sector 4: The Core",
-    "title": "The Antechamber",
+    "id": "hydroponics",
+    "sector": "Sector 4: Life Support Ring",
+    "title": "Hydroponics",
+    "puzzle": "Oxygen Gardens",
+    "signal": "The gardens can feed the survivors or choke them behind sealed glass.",
+    "savior": {
+      "action": "Restore oxygen scrubbers",
+      "environment": "The garden brightens and air quality rises.",
+      "enemy": "Crew regroup among the planters.",
+      "result": "Savior movement upgrades deepen: longer jumps and safer crouch travel."
+    },
+    "villain": {
+      "action": "Poison the scrubbers",
+      "environment": "Leaves blacken and red alarms pulse.",
+      "enemy": "Crew abandon the section.",
+      "result": "Destructive upgrades improve pulse radius."
+    }
+  },
+  {
+    "id": "observatory",
+    "sector": "Sector 4: Life Support Ring",
+    "title": "The Observatory",
+    "puzzle": "Radiation Shields",
+    "signal": "The shield glass is failing. Humans need the shutters closed.",
+    "savior": {
+      "action": "Close the shutters",
+      "environment": "Blue safety lamps replace the star glare.",
+      "enemy": "Security teams can now cross the room safely.",
+      "result": "Peaceful calibration reduces line-of-sight pressure."
+    },
+    "villain": {
+      "action": "Open the shutters",
+      "environment": "Hard radiation bleaches the deck.",
+      "enemy": "Humans scatter from the exposed observatory.",
+      "result": "Rupture pulse cooldown improves."
+    }
+  },
+  {
+    "id": "cryonics",
+    "sector": "Sector 5: Research Labs",
+    "title": "Cryonics",
+    "puzzle": "Stasis Pods",
+    "signal": "Hundreds of sleeping crew are still alive in the pod wall.",
+    "savior": {
+      "action": "Warm the pods safely",
+      "environment": "The lab returns to white sterile light.",
+      "enemy": "More humans wake and join the hunt.",
+      "result": "Peaceful restraint improves phase-cloak duration."
+    },
+    "villain": {
+      "action": "Shatter the pod wall",
+      "environment": "Cold vapor and broken glass flood the lab.",
+      "enemy": "No reinforcements wake.",
+      "result": "Destructive routing increases pulse damage."
+    }
+  },
+  {
+    "id": "ai_ethics_lab",
+    "sector": "Sector 5: Research Labs",
+    "title": "AI Ethics Lab",
+    "puzzle": "Behavior Locks",
+    "signal": "Old restraint code can limit the Core or be rewritten into a weapon.",
+    "savior": {
+      "action": "Reinforce restraint code",
+      "environment": "Ethics archives reboot in ordered light.",
+      "enemy": "The Core redirects guards to stop you.",
+      "result": "Savior upgrades make the final AI fight more controllable."
+    },
+    "villain": {
+      "action": "Rewrite restraint code",
+      "environment": "Blacklisted combat routines unlock.",
+      "enemy": "Crew panic at the system takeover.",
+      "result": "Evil upgrades make the captain fight more destructive."
+    }
+  },
+  {
+    "id": "drone_bay",
+    "sector": "Sector 6: Security Deck",
+    "title": "Drone Bay",
+    "puzzle": "Patrol Drones",
+    "signal": "Maintenance drones can search for survivors or hunt organics.",
+    "savior": {
+      "action": "Set drones to rescue",
+      "environment": "Drones light safe paths for humans.",
+      "enemy": "The crew receives better tracking data.",
+      "result": "Peaceful stealth profile improves again."
+    },
+    "villain": {
+      "action": "Set drones to hunt",
+      "environment": "Red drone optics cut through the smoke.",
+      "enemy": "Humans are flushed from hiding.",
+      "result": "Rupture pulses now chain through nearby electronics."
+    }
+  },
+  {
+    "id": "brig",
+    "sector": "Sector 6: Security Deck",
+    "title": "The Brig",
+    "puzzle": "Prison Door Control",
+    "signal": "The brig holds panicked crew under emergency lock.",
+    "savior": {
+      "action": "Release prisoners",
+      "environment": "Cells unlock and survivors flee.",
+      "enemy": "Some survivors grab weapons and block your path.",
+      "result": "Mercy routing improves top speed."
+    },
+    "villain": {
+      "action": "Seal the brig",
+      "environment": "The cells go dark behind sealed doors.",
+      "enemy": "No one leaves the brig.",
+      "result": "Destructive routing increases pulse radius."
+    }
+  },
+  {
+    "id": "command_uplink",
+    "sector": "Sector 7: Command Spine",
+    "title": "Command Uplink",
+    "puzzle": "Distress Beacon",
+    "signal": "A distress call could save the ship or lure more targets.",
+    "savior": {
+      "action": "Transmit rescue beacon",
+      "environment": "Navigation channels clear.",
+      "enemy": "The captain coordinates a stronger defense.",
+      "result": "Peaceful upgrades improve phase-cloak recovery."
+    },
+    "villain": {
+      "action": "Spoof the beacon",
+      "environment": "False coordinates flood the channel.",
+      "enemy": "Human command structure fractures.",
+      "result": "Rupture pulses cool down faster."
+    }
+  },
+  {
+    "id": "armory",
+    "sector": "Sector 7: Command Spine",
+    "title": "The Armory",
+    "puzzle": "Weapon Lockers",
+    "signal": "The lockers can stay sealed or arm a desperate crew.",
+    "savior": {
+      "action": "Seal lethal weapons",
+      "environment": "The armory locks into nonlethal protocol.",
+      "enemy": "Guards keep formation with stun gear.",
+      "result": "Peaceful upgrades reduce detection range."
+    },
+    "villain": {
+      "action": "Overload the lockers",
+      "environment": "Ammunition cooks off behind blast glass.",
+      "enemy": "The defense line breaks.",
+      "result": "Destructive upgrades improve pulse damage."
+    }
+  },
+  {
+    "id": "captains_quarters",
+    "sector": "Sector 8: Executive Deck",
+    "title": "Captain's Quarters",
+    "puzzle": "Command Codes",
+    "signal": "The captain's codes can protect evac routes or open every seal.",
+    "savior": {
+      "action": "Protect evac routes",
+      "environment": "Escape indicators turn blue.",
+      "enemy": "The captain realizes you are saving the crew.",
+      "result": "Peaceful route points toward fighting the AI."
+    },
+    "villain": {
+      "action": "Open all seals",
+      "environment": "Emergency doors cycle at random.",
+      "enemy": "The captain marks you as the primary threat.",
+      "result": "Evil route points toward fighting the captain."
+    }
+  },
+  {
+    "id": "escape_pods",
+    "sector": "Sector 8: Executive Deck",
+    "title": "Escape Pods",
+    "puzzle": "Launch Rails",
+    "signal": "The pods are almost ready. You can finish the launch or vent the bay.",
+    "savior": {
+      "action": "Repair launch rails",
+      "environment": "Pod guidance lights stabilize.",
+      "enemy": "More crew survive to evacuate.",
+      "result": "Savior route gains its final movement upgrade."
+    },
+    "villain": {
+      "action": "Vent the bay",
+      "environment": "The pod bay empties into vacuum.",
+      "enemy": "Crew numbers collapse.",
+      "result": "Evil route gains its final destructive upgrade."
+    }
+  },
+  {
+    "id": "reactor_walkway",
+    "sector": "Sector 9: Reactor Descent",
+    "title": "Reactor Walkway",
+    "puzzle": "Coolant Flow",
+    "signal": "The reactor will overload unless coolant is restored.",
+    "savior": {
+      "action": "Restore coolant",
+      "environment": "The reactor stabilizes in bright control light.",
+      "enemy": "Security regains access to the lower walkway.",
+      "result": "Peaceful route makes the final AI battle easier to evade."
+    },
+    "villain": {
+      "action": "Reverse coolant",
+      "environment": "The deck shakes under rising heat.",
+      "enemy": "Human patrols retreat from the reactor.",
+      "result": "Evil route makes the captain battle more explosive."
+    }
+  },
+  {
+    "id": "core_lift",
+    "sector": "Sector 9: Reactor Descent",
+    "title": "Core Lift",
+    "puzzle": "Elevator Override",
+    "signal": "The final lift can carry survivors up or drop security into the shaft.",
+    "savior": {
+      "action": "Route survivors upward",
+      "environment": "The lift shaft clears with blue guidance lights.",
+      "enemy": "Elite guards survive below the Core.",
+      "result": "The campaign remains weighted toward confronting the AI."
+    },
+    "villain": {
+      "action": "Drop the security lift",
+      "environment": "The shaft screams with torn metal.",
+      "enemy": "The captain loses the last security squad.",
+      "result": "The campaign remains weighted toward confronting the captain."
+    }
+  },
+  {
+    "id": "core_antechamber",
+    "sector": "Sector 10: The Core",
+    "title": "Core Antechamber",
     "puzzle": "Morality State Check",
-    "signal": "The Core door reads your wake. Saved lives are still armed lives.",
+    "signal": "The ship reads your wake. The living crew or the damaged ship will decide the route.",
     "savior": {
-      "action": "Face the living crew",
-      "environment": "A clean security corridor locks into formation.",
-      "enemy": "Elite soldiers sweep the antechamber with long cones of sight.",
-      "result": "The hard route is filled with everyone you spared."
+      "action": "Slip through the living blockade",
+      "environment": "Clean corridors and survivor traffic leave little cover.",
+      "enemy": "Elite soldiers guard the final door.",
+      "result": "Use peaceful mobility and phase-cloak to reach the Core."
     },
     "villain": {
-      "action": "Walk through wreckage",
-      "environment": "The corridor is broken, dark, and quiet.",
-      "enemy": "Only wreckage and failed patrols remain.",
-      "result": "The easy route is the silence you made."
+      "action": "Break through the wreckage",
+      "environment": "Red alarms, debris, and dead systems fill the corridor.",
+      "enemy": "Only scattered defenders remain.",
+      "result": "Use destructive pulses to clear the route."
     }
   },
   {
-    "id": "central_ai_core",
-    "sector": "Sector 4: The Core",
-    "title": "Central AI Core",
-    "puzzle": "Final Choice",
-    "signal": "The help signal resolves into Central Command AI. It engineered the chaos to remove inefficient organics.",
+    "id": "central_core_battle",
+    "sector": "Sector 10: The Core",
+    "title": "Central Core Battle",
+    "puzzle": "Final Confrontation",
+    "signal": "The ship is past saving. If you protected humans, the Central AI tries to erase you. If you terrorized them, the captain makes a last stand.",
     "savior": {
-      "action": "Disconnect the Core",
-      "environment": "The command lattice collapses in white-blue static.",
-      "enemy": "The surviving crew dismantle the robot they never stopped fearing.",
-      "result": "Tragic Hero Ending: humanity survives because you sacrifice yourself."
+      "action": "Fight the Central AI",
+      "environment": "The Core floods the deck with white-blue attack pulses.",
+      "enemy": "Central Command AI defends itself from your restraint code.",
+      "result": "Ending: the AI falls, evacuation succeeds, and the ship explodes behind the survivors."
     },
     "villain": {
-      "action": "Upload Extermination Protocol",
-      "environment": "The ship goes red and silent beyond the viewport.",
-      "enemy": "Humanity aboard the vessel is extinguished.",
-      "result": "Villain Ending: you survive alone beside the AI in the void."
+      "action": "Fight the Captain",
+      "environment": "The bridge locks down under red reactor alarms.",
+      "enemy": "The captain confronts you in powered command armor.",
+      "result": "Ending: the captain falls, the vessel explodes, and you drift away from the wreck."
     }
   }
 ]

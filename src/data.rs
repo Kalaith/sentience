@@ -70,8 +70,8 @@ mod tests {
         let data = GameData::load().unwrap();
 
         assert_eq!(data.config.game_name, "sentience");
-        assert_eq!(data.levels.len(), 8);
+        assert_eq!(data.levels.len(), 20);
         assert_eq!(data.levels[0].title, "The Awakening");
-        assert_eq!(data.levels[7].puzzle, "Final Choice");
+        assert_eq!(data.levels[19].puzzle, "Final Confrontation");
     }
 }

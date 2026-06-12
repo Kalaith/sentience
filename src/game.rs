@@ -12,8 +12,7 @@ use macroquad_toolkit::notifications::{
     NotificationAnchor, NotificationManager, NotificationRenderConfig,
 };
 use macroquad_toolkit::persistence::{
-    delete_slot, get_save_slots, load_from_slot_with_migration, save_to_slot_with_version,
-    slot_exists,
+    get_save_slots, load_from_slot_with_migration, save_to_slot_with_version, slot_exists,
 };
 use macroquad_toolkit::prelude::{begin_virtual_ui_frame, dark, end_virtual_ui_frame};
 
@@ -94,6 +93,7 @@ impl Game {
         let ctx = UiContext {
             data: &self.data,
             session: &self.session,
+            assets: &self.assets,
             save_exists: self.save_exists,
             save_slots: &self.save_slots,
             loaded_assets: self.assets.len(),
@@ -127,7 +127,6 @@ impl Game {
             UiAction::CloseDecision => self.session.close_decision(),
             UiAction::Save => self.save_game(),
             UiAction::Load => self.load_game(),
-            UiAction::DeleteSave => self.delete_save(),
             UiAction::ApplyChoice(choice) => {
                 if let Some(event) = self.session.apply_choice(choice) {
                     self.handle_session_event(event);
@@ -144,11 +143,13 @@ impl Game {
             SessionEvent::ChoiceApplied(choice) => match choice {
                 MoralChoice::Savior => self
                     .notifications
-                    .warning("Savior route engaged. Crew threat increased."),
+                    .warning("Savior upgrade gained: stealth and movement improved."),
                 MoralChoice::Villain => self
                     .notifications
-                    .success("Villain route engaged. Crew threat reduced."),
+                    .success("Villain upgrade gained: destructive pulse improved."),
             },
+            SessionEvent::AbilityUsed(message) => self.notifications.info(message),
+            SessionEvent::BossDamaged(message) => self.notifications.warning(message),
             SessionEvent::LevelChanged(index) => {
                 if let Some(level) = self.data.levels.get(index) {
                     self.notifications.info(format!("Entering {}", level.title));
@@ -160,8 +161,8 @@ impl Game {
 
     fn notify_ending(&mut self, ending: EndingKind) {
         match ending {
-            EndingKind::TragicHero => self.notifications.warning(ending.title()),
-            EndingKind::VillainAlone => self.notifications.danger(ending.title()),
+            EndingKind::AiDefeated => self.notifications.warning(ending.title()),
+            EndingKind::CaptainDefeated => self.notifications.danger(ending.title()),
         }
     }
 
@@ -199,16 +200,6 @@ impl Game {
         }
     }
 
-    fn delete_save(&mut self) {
-        match delete_slot(&self.data.config.game_name, &self.data.config.save_slot) {
-            Ok(()) => {
-                self.notifications.info("Deleted save slot");
-                self.refresh_save_state();
-            }
-            Err(err) => self.notifications.danger(format!("Delete failed: {}", err)),
-        }
-    }
-
     fn refresh_save_state(&mut self) {
         self.save_exists = slot_exists(&self.data.config.game_name, &self.data.config.save_slot);
         self.save_slots = get_save_slots(&self.data.config.game_name);
@@ -231,6 +222,7 @@ fn capture_controls() -> ControlInput {
             || is_key_pressed(KeyCode::Up),
         crouch_held: is_key_down(KeyCode::S) || is_key_down(KeyCode::Down),
         interact_pressed: is_key_pressed(KeyCode::E) || is_key_pressed(KeyCode::Enter),
+        ability_pressed: is_key_pressed(KeyCode::F),
         retry_pressed: is_key_pressed(KeyCode::R),
     }
 }

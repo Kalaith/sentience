@@ -6,6 +6,7 @@ use crate::geometry::{
     rects_overlap, FLOOR_Y, PLAYER_H, PLAYER_W, WORLD_HEIGHT, WORLD_WIDTH,
 };
 use crate::levels::build_level;
+use crate::progression::{UpgradeProfile, CHOICE_LEVELS};
 use macroquad::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -27,26 +28,22 @@ impl MoralChoice {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EndingKind {
-    TragicHero,
-    VillainAlone,
+    AiDefeated,
+    CaptainDefeated,
 }
 
 impl EndingKind {
     pub fn title(self) -> &'static str {
         match self {
-            Self::TragicHero => "Tragic Hero Ending",
-            Self::VillainAlone => "Villain Ending",
+            Self::AiDefeated => "AI Defeated Ending",
+            Self::CaptainDefeated => "Captain Defeated Ending",
         }
     }
 
     pub fn body(self) -> &'static str {
         match self {
-            Self::TragicHero => {
-                "You disconnect Central Command AI. The ship survives, and the crew dismantles the robot they still believe went rogue."
-            }
-            Self::VillainAlone => {
-                "You upload the extermination protocol. The crew vanishes from the manifest, and you remain awake in the void."
-            }
+            Self::AiDefeated => "You defeat Central Command AI and force the evacuation doors open. The rescued humans escape as the ship tears itself apart behind them.",
+            Self::CaptainDefeated => "You defeat the captain's last stand and seize the bridge. Reactor failure finishes what you started: the ship explodes either way.",
         }
     }
 }
@@ -54,7 +51,6 @@ impl EndingKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DecisionKind {
     Level,
-    Final,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -69,171 +65,12 @@ pub enum SessionMode {
 pub enum LevelPhase {
     AwaitingChoice,
     Resolved(MoralChoice),
-    StateCheck(MoralChoice),
     Final,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum GuardKind {
-    Human,
-    Elite,
-    Turret,
-}
-
-#[derive(Debug, Clone)]
-pub struct GuardState {
-    pub name: String,
-    pub kind: GuardKind,
-    pub x: f32,
-    pub y: f32,
-    pub start_x: f32,
-    pub end_x: f32,
-    pub dir: f32,
-    pub speed: f32,
-    pub range: f32,
-    pub fov_degrees: f32,
-    pub active: bool,
-    pub alive: bool,
-    pub panicked: bool,
-    pub floating: bool,
-    scan_phase: f32,
-}
-
-impl GuardState {
-    pub(crate) fn human(name: &str, x: f32, start_x: f32, end_x: f32) -> Self {
-        Self {
-            name: name.to_owned(),
-            kind: GuardKind::Human,
-            x,
-            y: FLOOR_Y,
-            start_x,
-            end_x,
-            dir: 1.0,
-            speed: 70.0,
-            range: 230.0,
-            fov_degrees: 66.0,
-            active: true,
-            alive: true,
-            panicked: false,
-            floating: false,
-            scan_phase: 0.0,
-        }
-    }
-
-    pub(crate) fn elite(name: &str, x: f32, start_x: f32, end_x: f32) -> Self {
-        Self::human(name, x, start_x, end_x)
-            .with_speed(118.0)
-            .with_detection(390.0, 78.0)
-            .with_kind(GuardKind::Elite)
-    }
-
-    pub(crate) fn turret(name: &str, x: f32, y: f32) -> Self {
-        Self {
-            name: name.to_owned(),
-            kind: GuardKind::Turret,
-            x,
-            y,
-            start_x: x,
-            end_x: x,
-            dir: 1.0,
-            speed: 0.0,
-            range: 500.0,
-            fov_degrees: 74.0,
-            active: true,
-            alive: true,
-            panicked: false,
-            floating: false,
-            scan_phase: 0.0,
-        }
-    }
-
-    pub(crate) fn with_kind(mut self, kind: GuardKind) -> Self {
-        self.kind = kind;
-        self
-    }
-
-    pub(crate) fn with_speed(mut self, speed: f32) -> Self {
-        self.speed = speed;
-        self
-    }
-
-    pub(crate) fn with_detection(mut self, range: f32, fov_degrees: f32) -> Self {
-        self.range = range;
-        self.fov_degrees = fov_degrees;
-        self
-    }
-
-    pub(crate) fn inactive(mut self) -> Self {
-        self.active = false;
-        self
-    }
-
-    pub(crate) fn dead(mut self) -> Self {
-        self.active = false;
-        self.alive = false;
-        self
-    }
-
-    pub(crate) fn panicked(mut self) -> Self {
-        self.panicked = true;
-        self
-    }
-
-    pub(crate) fn floating(mut self, y: f32) -> Self {
-        self.active = false;
-        self.floating = true;
-        self.y = y;
-        self
-    }
-
-    pub fn body_rect(&self) -> Rect {
-        match self.kind {
-            GuardKind::Turret => Rect::new(self.x - 22.0, self.y, 44.0, 24.0),
-            GuardKind::Human | GuardKind::Elite => {
-                Rect::new(self.x - 14.0, self.y - 44.0, 28.0, 44.0)
-            }
-        }
-    }
-
-    pub fn eye_position(&self) -> Vec2 {
-        match self.kind {
-            GuardKind::Turret => vec2(self.x, self.y + 24.0),
-            GuardKind::Human | GuardKind::Elite => vec2(self.x + self.dir * 12.0, self.y - 34.0),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CrateState {
-    pub rect: Rect,
-    pub marked: bool,
-}
-
-#[derive(Debug, Clone, Copy, Default)]
-pub struct Ambience {
-    pub clean: bool,
-    pub emergency: bool,
-    pub smoke: bool,
-    pub darkness: bool,
-    pub gravity_off: bool,
-    pub sparks: bool,
-    pub quiet: bool,
-    pub turret_hacked: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct LevelRuntime {
-    pub phase: LevelPhase,
-    pub platforms: Vec<Rect>,
-    pub crates: Vec<CrateState>,
-    pub guards: Vec<GuardState>,
-    pub console: Option<Rect>,
-    pub core: Option<Rect>,
-    pub exit: Rect,
-    pub exit_unlocked: bool,
-    pub ambience: Ambience,
-    pub time: f32,
-}
+pub use crate::entities::{
+    Ambience, BossKind, BossState, CrateState, GuardKind, GuardState, LevelRuntime,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PlayerState {
@@ -243,6 +80,9 @@ pub struct PlayerState {
     pub vy: f32,
     pub crouching: bool,
     pub grounded: bool,
+    pub cloak_timer: f32,
+    pub ability_cooldown: f32,
+    pub pulse_timer: f32,
 }
 
 impl PlayerState {
@@ -254,6 +94,9 @@ impl PlayerState {
             vy: 0.0,
             crouching: false,
             grounded: true,
+            cloak_timer: 0.0,
+            ability_cooldown: 0.0,
+            pulse_timer: 0.0,
         }
     }
 }
@@ -283,6 +126,7 @@ pub struct ControlInput {
     pub jump_pressed: bool,
     pub crouch_held: bool,
     pub interact_pressed: bool,
+    pub ability_pressed: bool,
     pub retry_pressed: bool,
 }
 
@@ -290,6 +134,8 @@ pub struct ControlInput {
 pub enum SessionEvent {
     Caught(String),
     ChoiceApplied(MoralChoice),
+    AbilityUsed(String),
+    BossDamaged(String),
     LevelChanged(usize),
     EndingReached(EndingKind),
 }
@@ -310,7 +156,7 @@ impl GameSession {
 
     pub fn from_save(save: SaveData, data: &GameData) -> Self {
         let mut choices = save.choices;
-        choices.truncate(6);
+        choices.truncate(CHOICE_LEVELS);
         let level_index = save.level_index.min(data.levels.len().saturating_sub(1));
         let mode = save
             .ending
@@ -368,13 +214,34 @@ impl GameSession {
                 }
 
                 self.runtime.time += dt;
+                self.update_player_timers(dt);
                 self.update_player(config, dt, input);
                 self.update_guards(dt);
+                self.update_boss(dt);
+
+                if input.ability_pressed {
+                    if let Some(event) = self.use_route_ability() {
+                        events.push(event);
+                    }
+                }
 
                 if let Some(reason) = self.detected_by_guard() {
                     self.deaths += 1;
                     self.mode = SessionMode::Dismantled(reason.clone());
                     events.push(SessionEvent::Caught(reason));
+                    return events;
+                }
+
+                if let Some(reason) = self.detected_by_boss_hazard() {
+                    self.deaths += 1;
+                    self.mode = SessionMode::Dismantled(reason.clone());
+                    events.push(SessionEvent::Caught(reason));
+                    return events;
+                }
+
+                if let Some(ending) = self.boss_ending_if_defeated() {
+                    self.mode = SessionMode::Ending(ending);
+                    events.push(SessionEvent::EndingReached(ending));
                     return events;
                 }
 
@@ -399,7 +266,7 @@ impl GameSession {
     pub fn apply_choice(&mut self, choice: MoralChoice) -> Option<SessionEvent> {
         match self.mode {
             SessionMode::DecisionOpen(DecisionKind::Level) => {
-                if self.level_index < 6 {
+                if self.level_index < CHOICE_LEVELS {
                     while self.choices.len() <= self.level_index {
                         self.choices.push(MoralChoice::Savior);
                     }
@@ -411,14 +278,6 @@ impl GameSession {
                 } else {
                     None
                 }
-            }
-            SessionMode::DecisionOpen(DecisionKind::Final) => {
-                let ending = match choice {
-                    MoralChoice::Savior => EndingKind::TragicHero,
-                    MoralChoice::Villain => EndingKind::VillainAlone,
-                };
-                self.mode = SessionMode::Ending(ending);
-                Some(SessionEvent::EndingReached(ending))
             }
             SessionMode::Playing | SessionMode::Dismantled(_) | SessionMode::Ending(_) => None,
         }
@@ -466,8 +325,8 @@ impl GameSession {
         match self.mode {
             SessionMode::Playing => match self.runtime.phase {
                 LevelPhase::AwaitingChoice => "Interface with the ship system.",
-                LevelPhase::Resolved(_) | LevelPhase::StateCheck(_) => "Reach the exit hatch.",
-                LevelPhase::Final => "Interface with the Central AI Core.",
+                LevelPhase::Resolved(_) => "Reach the exit hatch.",
+                LevelPhase::Final => "Fight the final opponent. Use F when close or exposed.",
             },
             SessionMode::DecisionOpen(_) => "Choose the system command.",
             SessionMode::Dismantled(_) => "Dismantled. Retry this level.",
@@ -499,25 +358,148 @@ impl GameSession {
             }
         }
 
-        if matches!(self.runtime.phase, LevelPhase::Final) {
-            if self
-                .runtime
-                .core
-                .is_some_and(|core| rects_overlap(player, core))
-            {
-                return Some(DecisionKind::Final);
-            }
-        }
-
         None
     }
 
+    pub fn upgrade_profile(&self) -> UpgradeProfile {
+        UpgradeProfile::from_choices(&self.choices)
+    }
+
+    pub fn route_name(&self) -> &'static str {
+        self.upgrade_profile().dominant_route().label()
+    }
+
+    fn update_player_timers(&mut self, dt: f32) {
+        self.player.cloak_timer = (self.player.cloak_timer - dt).max(0.0);
+        self.player.ability_cooldown = (self.player.ability_cooldown - dt).max(0.0);
+        self.player.pulse_timer = (self.player.pulse_timer - dt).max(0.0);
+    }
+
+    fn use_route_ability(&mut self) -> Option<SessionEvent> {
+        if self.player.ability_cooldown > 0.0 {
+            return None;
+        }
+
+        let profile = self.upgrade_profile();
+        self.player.ability_cooldown = profile.ability_cooldown;
+        self.player.pulse_timer = 0.28;
+
+        match profile.dominant_route() {
+            MoralChoice::Savior => {
+                self.player.cloak_timer = profile.cloak_duration;
+                if let Some(message) = self.damage_boss_near_player(1 + (profile.savior / 6) as i32)
+                {
+                    return Some(SessionEvent::BossDamaged(message));
+                }
+                Some(SessionEvent::AbilityUsed(format!(
+                    "Phase cloak engaged for {:.1}s",
+                    profile.cloak_duration
+                )))
+            }
+            MoralChoice::Villain => {
+                let destroyed = self.destroy_nearby_threats(profile.pulse_range);
+                if let Some(message) = self.damage_boss_near_player(profile.pulse_damage) {
+                    return Some(SessionEvent::BossDamaged(message));
+                }
+                Some(SessionEvent::AbilityUsed(format!(
+                    "Rupture pulse hit {} object(s)",
+                    destroyed
+                )))
+            }
+        }
+    }
+
+    fn destroy_nearby_threats(&mut self, range: f32) -> usize {
+        let origin = rect_center(self.player_rect());
+        let mut destroyed = 0;
+        for guard in &mut self.runtime.guards {
+            if !guard.alive {
+                continue;
+            }
+            if origin.distance(rect_center(guard.body_rect())) <= range {
+                guard.active = false;
+                guard.alive = false;
+                destroyed += 1;
+            }
+        }
+
+        let before = self.runtime.crates.len();
+        self.runtime
+            .crates
+            .retain(|crate_state| origin.distance(rect_center(crate_state.rect)) > range);
+        destroyed + before.saturating_sub(self.runtime.crates.len())
+    }
+
+    fn damage_boss_near_player(&mut self, damage: i32) -> Option<String> {
+        let player = inflate(self.player_rect(), 120.0);
+        let boss = self.runtime.boss.as_mut()?;
+        if !rects_overlap(player, boss.body_rect()) && !rects_overlap(player, boss.danger_rect()) {
+            return None;
+        }
+
+        boss.health = (boss.health - damage).max(0);
+        Some(format!(
+            "{} integrity reduced to {}/{}",
+            boss.kind.label(),
+            boss.health,
+            boss.max_health
+        ))
+    }
+
+    fn update_boss(&mut self, dt: f32) {
+        let Some(boss) = self.runtime.boss.as_mut() else {
+            return;
+        };
+
+        boss.danger_timer = (boss.danger_timer - dt).max(0.0);
+        boss.attack_timer -= dt;
+        if boss.attack_timer <= 0.0 {
+            boss.danger_timer = 0.78;
+            boss.attack_timer = match boss.kind {
+                BossKind::CentralAi => 2.1,
+                BossKind::Captain => 1.65,
+            };
+        }
+
+        if boss.kind == BossKind::Captain {
+            boss.x += boss.dir * 82.0 * dt;
+            if boss.x < boss.start_x {
+                boss.x = boss.start_x;
+                boss.dir = 1.0;
+            } else if boss.x > boss.end_x {
+                boss.x = boss.end_x;
+                boss.dir = -1.0;
+            }
+        }
+    }
+
+    fn detected_by_boss_hazard(&self) -> Option<String> {
+        let boss = self.runtime.boss.as_ref()?;
+        if boss.danger_timer <= 0.0 || self.player.cloak_timer > 0.0 {
+            return None;
+        }
+        if rects_overlap(self.player_rect(), boss.danger_rect()) {
+            Some(format!("{} attack pulse dismantled you", boss.kind.label()))
+        } else {
+            None
+        }
+    }
+
+    fn boss_ending_if_defeated(&self) -> Option<EndingKind> {
+        self.runtime
+            .boss
+            .as_ref()
+            .filter(|boss| boss.health <= 0)
+            .map(|boss| boss.kind.ending())
+    }
+
     fn update_player(&mut self, config: &GameConfig, dt: f32, input: ControlInput) {
+        let profile = self.upgrade_profile();
         self.player.crouching = input.crouch_held && self.player.grounded;
         let base_speed = if self.player.crouching {
-            config.crouch_speed
+            config.crouch_speed + profile.crouch_bonus
         } else {
-            config.player_speed
+            config.player_speed + profile.speed_bonus
         };
         let control = if self.player.grounded {
             1.0
@@ -527,7 +509,7 @@ impl GameSession {
         self.player.vx = input.move_axis * base_speed * control;
 
         if input.jump_pressed && self.player.grounded && !self.player.crouching {
-            self.player.vy = config.jump_velocity;
+            self.player.vy = config.jump_velocity - profile.jump_bonus;
             self.player.grounded = false;
         }
 
@@ -644,6 +626,9 @@ impl GameSession {
         if !guard.active || !guard.alive {
             return false;
         }
+        if self.player.cloak_timer > 0.0 {
+            return false;
+        }
 
         let eye = guard.eye_position();
         let mut target = rect_center(self.player_rect());
@@ -653,7 +638,9 @@ impl GameSession {
 
         let delta = target - eye;
         let distance = delta.length();
-        if distance > guard.range || distance < 1.0 {
+        let profile = self.upgrade_profile();
+        let range = guard.range * profile.stealth_factor;
+        if distance > range || distance < 1.0 {
             return false;
         }
 
@@ -712,12 +699,27 @@ pub fn migrate_save_value(
     data: &GameData,
 ) -> Result<SaveData, String> {
     let payload = value.get("data").cloned().unwrap_or(value);
-    let mut save = serde_json::from_value::<SaveData>(payload)
-        .map_err(|err| format!("Unsupported save format {:?}: {}", detected_version, err))?;
+    let mut save = match serde_json::from_value::<SaveData>(payload.clone()) {
+        Ok(save) => save,
+        Err(first_err) => {
+            let mut repaired = payload;
+            if let Value::Object(map) = &mut repaired {
+                if map.contains_key("ending") {
+                    map.insert("ending".to_owned(), Value::Null);
+                }
+            }
+            serde_json::from_value::<SaveData>(repaired).map_err(|err| {
+                format!(
+                    "Unsupported save format {:?}: {}; retry after ending repair: {}",
+                    detected_version, first_err, err
+                )
+            })?
+        }
+    };
 
     save.version = data.config.version.clone();
     save.level_index = save.level_index.min(data.levels.len().saturating_sub(1));
-    save.choices.truncate(6);
+    save.choices.truncate(CHOICE_LEVELS);
     Ok(save)
 }
 
@@ -727,6 +729,21 @@ mod tests {
 
     fn test_data() -> GameData {
         GameData::load().unwrap()
+    }
+
+    fn move_right_input() -> ControlInput {
+        right_input(false)
+    }
+
+    fn right_input(jump_pressed: bool) -> ControlInput {
+        ControlInput {
+            move_axis: 1.0,
+            jump_pressed,
+            crouch_held: false,
+            interact_pressed: false,
+            ability_pressed: false,
+            retry_pressed: false,
+        }
     }
 
     #[test]
@@ -746,7 +763,71 @@ mod tests {
     }
 
     #[test]
-    fn villain_majority_makes_antechamber_easy_route() {
+    fn first_savior_route_can_reach_exit() {
+        let data = test_data();
+        let mut session = GameSession::new(&data);
+
+        session.mode = SessionMode::DecisionOpen(DecisionKind::Level);
+        session.apply_choice(MoralChoice::Savior);
+
+        for _ in 0..(60 * 7) {
+            session.update(&data, &data.config, 1.0 / 60.0, move_right_input());
+            if session.level_index == 1 {
+                assert!(matches!(session.mode, SessionMode::Playing));
+                return;
+            }
+            assert!(
+                !matches!(session.mode, SessionMode::Dismantled(_)),
+                "first savior route became unwinnable: {:?}",
+                session.mode
+            );
+        }
+
+        panic!("first savior route did not reach the exit within 7 seconds");
+    }
+
+    #[test]
+    fn first_savior_guard_platform_is_jump_reachable() {
+        let data = test_data();
+        let mut session = GameSession::new(&data);
+
+        session.mode = SessionMode::DecisionOpen(DecisionKind::Level);
+        session.apply_choice(MoralChoice::Savior);
+        session.runtime.guards.clear();
+        session.player.x = 620.0;
+        session.player.y = FLOOR_Y - PLAYER_H;
+        session.player.vx = 0.0;
+        session.player.vy = 0.0;
+        session.player.grounded = true;
+
+        let target = session
+            .runtime
+            .platforms
+            .iter()
+            .copied()
+            .find(|platform| platform.x > 600.0 && platform.y < FLOOR_Y)
+            .expect("first level should have an overhead guard platform");
+
+        for frame in 0..(60 * 2) {
+            session.update(&data, &data.config, 1.0 / 60.0, right_input(frame == 0));
+            if session.player.grounded {
+                let player = session.player_rect();
+                let standing_on_target = horizontal_overlap(player, target)
+                    && (rect_bottom(player) - target.y).abs() < 0.5;
+                if standing_on_target {
+                    return;
+                }
+            }
+        }
+
+        panic!(
+            "first savior guard platform at y={} was not reachable from the floor",
+            target.y
+        );
+    }
+
+    #[test]
+    fn villain_majority_routes_final_boss_to_captain() {
         let choices = vec![
             MoralChoice::Villain,
             MoralChoice::Villain,
@@ -755,10 +836,10 @@ mod tests {
             MoralChoice::Villain,
             MoralChoice::Savior,
         ];
-        let runtime = build_level(6, &choices);
+        let runtime = build_level(19, &choices);
 
-        assert_eq!(runtime.phase, LevelPhase::StateCheck(MoralChoice::Villain));
+        assert_eq!(runtime.phase, LevelPhase::Final);
         assert!(runtime.ambience.darkness);
-        assert!(runtime.guards.iter().all(|guard| !guard.active));
+        assert_eq!(runtime.boss.unwrap().kind, BossKind::Captain);
     }
 }

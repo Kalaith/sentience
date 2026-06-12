@@ -1,1 +1,37 @@
-[]
+[
+  {
+    "key": "ship_background",
+    "path": "assets/images/ship_background.png",
+    "filter": "linear"
+  },
+  {
+    "key": "robot",
+    "path": "assets/images/robot.png",
+    "filter": "linear"
+  },
+  {
+    "key": "guard",
+    "path": "assets/images/guard.png",
+    "filter": "linear"
+  },
+  {
+    "key": "captain",
+    "path": "assets/images/captain.png",
+    "filter": "linear"
+  },
+  {
+    "key": "ai_core",
+    "path": "assets/images/ai_core.png",
+    "filter": "linear"
+  },
+  {
+    "key": "machine",
+    "path": "assets/images/machine.png",
+    "filter": "linear"
+  },
+  {
+    "key": "crate",
+    "path": "assets/images/crate.png",
+    "filter": "linear"
+  }
+]

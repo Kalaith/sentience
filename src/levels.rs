@@ -1,48 +1,42 @@
 //! Level construction for the locked Sentience campaign.
 
 use crate::geometry::{FLOOR_Y, WORLD_HEIGHT, WORLD_WIDTH};
-use crate::state::{Ambience, CrateState, GuardState, LevelPhase, LevelRuntime, MoralChoice};
+use crate::progression::{campaign_bias, TOTAL_LEVELS};
+use crate::state::{
+    Ambience, BossState, CrateState, GuardState, LevelPhase, LevelRuntime, MoralChoice,
+};
 use macroquad::prelude::*;
 
 pub(crate) fn build_level(index: usize, choices: &[MoralChoice]) -> LevelRuntime {
     let phase = phase_for_level(index, choices);
+    let final_level = index + 1 == TOTAL_LEVELS;
     let mut runtime = LevelRuntime {
         phase,
-        platforms: base_platforms(),
+        platforms: base_platforms(index),
         crates: Vec::new(),
         guards: Vec::new(),
-        console: (index < 6).then_some(Rect::new(510.0, FLOOR_Y - 66.0, 58.0, 66.0)),
-        core: (index == 7).then_some(Rect::new(490.0, 202.0, 140.0, 260.0)),
+        console: (!final_level).then_some(Rect::new(504.0, FLOOR_Y - 66.0, 58.0, 66.0)),
+        core: final_level.then_some(Rect::new(490.0, 202.0, 140.0, 260.0)),
+        boss: None,
         exit: Rect::new(1064.0, FLOOR_Y - 86.0, 46.0, 86.0),
         exit_unlocked: false,
         ambience: Ambience::default(),
         time: 0.0,
     };
 
-    match index {
-        0 => build_awakening(&mut runtime),
-        1 => build_loading_dock(&mut runtime),
-        2 => build_mess_hall(&mut runtime),
-        3 => build_med_bay(&mut runtime),
-        4 => build_generator(&mut runtime),
-        5 => build_weapon_systems(&mut runtime),
-        6 => build_antechamber(&mut runtime),
-        7 => build_core(&mut runtime),
-        _ => {}
+    if final_level {
+        build_final_battle(&mut runtime, campaign_bias(choices));
+    } else {
+        build_decision_room(&mut runtime, index);
     }
 
-    runtime.exit_unlocked = match runtime.phase {
-        LevelPhase::AwaitingChoice | LevelPhase::Final => false,
-        LevelPhase::Resolved(_) | LevelPhase::StateCheck(_) => index < 7,
-    };
+    runtime.exit_unlocked = matches!(runtime.phase, LevelPhase::Resolved(_)) && !final_level;
     runtime
 }
 
 fn phase_for_level(index: usize, choices: &[MoralChoice]) -> LevelPhase {
-    if index == 7 {
+    if index + 1 == TOTAL_LEVELS {
         LevelPhase::Final
-    } else if index == 6 {
-        LevelPhase::StateCheck(campaign_bias(choices))
     } else if let Some(choice) = choices.get(index) {
         LevelPhase::Resolved(*choice)
     } else {
@@ -50,268 +44,175 @@ fn phase_for_level(index: usize, choices: &[MoralChoice]) -> LevelPhase {
     }
 }
 
-fn campaign_bias(choices: &[MoralChoice]) -> MoralChoice {
-    let savior = choices
-        .iter()
-        .filter(|choice| **choice == MoralChoice::Savior)
-        .count();
-    let villain = choices.len().saturating_sub(savior);
-    if savior >= villain {
-        MoralChoice::Savior
-    } else {
-        MoralChoice::Villain
+fn base_platforms(index: usize) -> Vec<Rect> {
+    if index == 0 {
+        return vec![
+            Rect::new(0.0, FLOOR_Y, WORLD_WIDTH, WORLD_HEIGHT - FLOOR_Y),
+            Rect::new(168.0, 430.0, 170.0, 18.0),
+            Rect::new(690.0, 428.0, 240.0, 18.0),
+        ];
     }
-}
 
-fn base_platforms() -> Vec<Rect> {
-    vec![
+    let shift = (index % 4) as f32 * 24.0;
+    let mut platforms = vec![
         Rect::new(0.0, FLOOR_Y, WORLD_WIDTH, WORLD_HEIGHT - FLOOR_Y),
-        Rect::new(186.0, 406.0, 178.0, 18.0),
-        Rect::new(724.0, 382.0, 206.0, 18.0),
-    ]
+        Rect::new(168.0 + shift, 414.0, 170.0, 18.0),
+        Rect::new(720.0 - shift * 0.5, 384.0, 210.0, 18.0),
+    ];
+    if index % 3 == 1 {
+        platforms.push(Rect::new(430.0, 344.0, 160.0, 18.0));
+    }
+    if index % 5 == 3 {
+        platforms.push(Rect::new(560.0, 452.0, 122.0, 16.0));
+    }
+    platforms
 }
 
-fn build_awakening(runtime: &mut LevelRuntime) {
+fn build_decision_room(runtime: &mut LevelRuntime, index: usize) {
+    add_level_crates(runtime, index);
     match runtime.phase {
-        LevelPhase::Resolved(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime.guards.push(
-                GuardState::human("Cargo guard", 830.0, 710.0, 1030.0)
-                    .with_speed(112.0)
-                    .with_detection(360.0, 74.0),
-            );
-        }
-        LevelPhase::Resolved(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.gravity_off = true;
-            runtime.ambience.sparks = true;
-            runtime
-                .guards
-                .push(GuardState::human("Floating guard", 810.0, 760.0, 850.0).floating(300.0));
-        }
-        LevelPhase::AwaitingChoice => {
-            runtime.ambience.emergency = true;
-            runtime.guards.push(
-                GuardState::human("Unsteady guard", 880.0, 780.0, 980.0)
-                    .with_speed(38.0)
-                    .with_detection(160.0, 58.0),
-            );
-        }
-        LevelPhase::StateCheck(_) | LevelPhase::Final => {}
+        LevelPhase::AwaitingChoice => build_unresolved_room(runtime, index),
+        LevelPhase::Resolved(MoralChoice::Savior) => build_savior_room(runtime, index),
+        LevelPhase::Resolved(MoralChoice::Villain) => build_villain_room(runtime, index),
+        LevelPhase::Final => {}
     }
 }
 
-fn build_loading_dock(runtime: &mut LevelRuntime) {
-    runtime.crates.push(CrateState {
-        rect: Rect::new(420.0, FLOOR_Y - 42.0, 54.0, 42.0),
-        marked: true,
-    });
-
-    match runtime.phase {
-        LevelPhase::Resolved(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime.guards.push(
-                GuardState::human("Rescued dock guard", 760.0, 650.0, 1030.0)
-                    .with_speed(96.0)
-                    .with_detection(320.0, 72.0),
-            );
-        }
-        LevelPhase::Resolved(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.sparks = true;
-            runtime
-                .guards
-                .push(GuardState::human("Crushed dock guard", 690.0, 690.0, 690.0).dead());
-            runtime.crates.push(CrateState {
-                rect: Rect::new(638.0, FLOOR_Y - 48.0, 68.0, 48.0),
-                marked: false,
-            });
-        }
-        LevelPhase::AwaitingChoice => {
-            runtime.ambience.emergency = true;
-            runtime
-                .guards
-                .push(GuardState::human("Pinned guard", 690.0, 690.0, 690.0).inactive());
-        }
-        LevelPhase::StateCheck(_) | LevelPhase::Final => {}
+fn add_level_crates(runtime: &mut LevelRuntime, index: usize) {
+    if index % 2 == 1 {
+        runtime.crates.push(CrateState {
+            rect: Rect::new(
+                392.0 + (index % 3) as f32 * 28.0,
+                FLOOR_Y - 42.0,
+                54.0,
+                42.0,
+            ),
+            marked: index % 4 == 1,
+        });
+    }
+    if index % 6 == 4 {
+        runtime.crates.push(CrateState {
+            rect: Rect::new(642.0, FLOOR_Y - 48.0, 68.0, 48.0),
+            marked: false,
+        });
     }
 }
 
-fn build_mess_hall(runtime: &mut LevelRuntime) {
-    runtime.platforms.push(Rect::new(348.0, 448.0, 120.0, 16.0));
-    match runtime.phase {
-        LevelPhase::Resolved(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime.guards.push(
-                GuardState::human("Mess hall marksman", 760.0, 690.0, 900.0)
-                    .with_speed(64.0)
-                    .with_detection(430.0, 60.0),
-            );
-            runtime.guards.push(
-                GuardState::human("Galley scout", 970.0, 900.0, 1050.0)
-                    .with_speed(78.0)
-                    .with_detection(340.0, 68.0),
-            );
-        }
-        LevelPhase::Resolved(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.smoke = true;
-            runtime.guards.push(
-                GuardState::human("Coughing crew", 790.0, 720.0, 880.0)
-                    .inactive()
-                    .panicked(),
-            );
-        }
-        LevelPhase::AwaitingChoice => {
-            runtime.ambience.smoke = true;
-            runtime.ambience.emergency = true;
-            runtime.guards.push(
-                GuardState::human("Confused diner", 850.0, 800.0, 920.0)
-                    .with_speed(28.0)
-                    .with_detection(120.0, 48.0)
-                    .panicked(),
-            );
-        }
-        LevelPhase::StateCheck(_) | LevelPhase::Final => {}
-    }
-}
-
-fn build_med_bay(runtime: &mut LevelRuntime) {
-    runtime.platforms.push(Rect::new(672.0, 442.0, 146.0, 16.0));
-    match runtime.phase {
-        LevelPhase::Resolved(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime.guards.push(
-                GuardState::human("Healed guard", 805.0, 760.0, 910.0)
-                    .with_speed(88.0)
-                    .with_detection(310.0, 76.0),
-            );
-            runtime.guards.push(
-                GuardState::human("Recovered guard", 965.0, 910.0, 1040.0)
-                    .with_speed(76.0)
-                    .with_detection(300.0, 76.0),
-            );
-        }
-        LevelPhase::Resolved(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.quiet = true;
-        }
-        LevelPhase::AwaitingChoice => {
-            runtime.ambience.emergency = true;
-            runtime
-                .guards
-                .push(GuardState::human("Injured guard", 890.0, 890.0, 890.0).inactive());
-        }
-        LevelPhase::StateCheck(_) | LevelPhase::Final => {}
-    }
-}
-
-fn build_generator(runtime: &mut LevelRuntime) {
-    runtime.platforms.push(Rect::new(450.0, 362.0, 196.0, 18.0));
-    match runtime.phase {
-        LevelPhase::Resolved(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime.guards.push(
-                GuardState::human("Generator guard", 710.0, 610.0, 900.0)
-                    .with_speed(104.0)
-                    .with_detection(380.0, 78.0),
-            );
-            runtime.guards.push(
-                GuardState::human("Power technician", 960.0, 900.0, 1050.0)
-                    .with_speed(88.0)
-                    .with_detection(330.0, 74.0),
-            );
-        }
-        LevelPhase::Resolved(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.darkness = true;
-            runtime.ambience.sparks = true;
-            runtime.guards.push(
-                GuardState::human("Blind searcher", 830.0, 780.0, 940.0)
-                    .with_speed(34.0)
-                    .with_detection(70.0, 46.0)
-                    .panicked(),
-            );
-        }
-        LevelPhase::AwaitingChoice => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.sparks = true;
-            runtime.guards.push(
-                GuardState::human("Distracted engineer", 900.0, 840.0, 990.0)
-                    .with_speed(38.0)
-                    .with_detection(150.0, 52.0),
-            );
-        }
-        LevelPhase::StateCheck(_) | LevelPhase::Final => {}
-    }
-}
-
-fn build_weapon_systems(runtime: &mut LevelRuntime) {
-    runtime.platforms.push(Rect::new(300.0, 430.0, 152.0, 16.0));
-    match runtime.phase {
-        LevelPhase::Resolved(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime
-                .guards
-                .push(GuardState::turret("Reset turret", 780.0, 260.0).with_detection(520.0, 78.0));
-        }
-        LevelPhase::Resolved(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.turret_hacked = true;
-            runtime.ambience.sparks = true;
-            runtime
-                .guards
-                .push(GuardState::turret("Organic-target turret", 780.0, 260.0).inactive());
-            runtime
-                .guards
-                .push(GuardState::human("Cleared soldier", 930.0, 930.0, 930.0).dead());
-        }
-        LevelPhase::AwaitingChoice => {
-            runtime.ambience.emergency = true;
-            runtime
-                .guards
-                .push(GuardState::turret("Looping turret", 780.0, 260.0).inactive());
-        }
-        LevelPhase::StateCheck(_) | LevelPhase::Final => {}
-    }
-}
-
-fn build_antechamber(runtime: &mut LevelRuntime) {
-    runtime.console = None;
-    runtime.platforms.push(Rect::new(404.0, 430.0, 150.0, 16.0));
-    runtime.platforms.push(Rect::new(812.0, 430.0, 130.0, 16.0));
-
-    match runtime.phase {
-        LevelPhase::StateCheck(MoralChoice::Savior) => {
-            runtime.ambience.clean = true;
-            runtime
-                .guards
-                .push(GuardState::elite("Elite soldier A", 560.0, 500.0, 680.0));
-            runtime
-                .guards
-                .push(GuardState::elite("Elite soldier B", 790.0, 720.0, 900.0));
-            runtime
-                .guards
-                .push(GuardState::elite("Elite soldier C", 1000.0, 910.0, 1060.0));
-        }
-        LevelPhase::StateCheck(MoralChoice::Villain) => {
-            runtime.ambience.emergency = true;
-            runtime.ambience.darkness = true;
-            runtime.ambience.quiet = true;
-            runtime
-                .guards
-                .push(GuardState::human("Failed patrol", 760.0, 760.0, 760.0).dead());
-        }
-        LevelPhase::AwaitingChoice | LevelPhase::Resolved(_) | LevelPhase::Final => {}
-    }
-}
-
-fn build_core(runtime: &mut LevelRuntime) {
-    runtime.console = None;
-    runtime.ambience.clean = true;
+fn build_unresolved_room(runtime: &mut LevelRuntime, index: usize) {
     runtime.ambience.emergency = true;
+    if index % 3 == 2 {
+        runtime.ambience.smoke = true;
+    }
+    runtime.guards.push(
+        GuardState::human("Uncertain guard", 850.0, 770.0, 960.0)
+            .with_speed(34.0 + index as f32 * 1.4)
+            .with_detection(145.0 + index as f32 * 4.0, 52.0),
+    );
+}
+
+fn build_savior_room(runtime: &mut LevelRuntime, index: usize) {
+    runtime.ambience.clean = true;
+    if index == 0 {
+        runtime.guards.push(
+            GuardState::human("Rescued patrol 1", 760.0, 760.0, 1060.0)
+                .with_speed(55.0)
+                .with_detection(215.0, 58.0),
+        );
+        return;
+    }
+    if index <= 2 {
+        runtime.guards.push(
+            GuardState::human("Rescued patrol 1", 900.0, 900.0, 1040.0)
+                .with_speed(48.0)
+                .with_detection(145.0, 54.0),
+        );
+        return;
+    }
+
+    let count = 1 + (index.saturating_sub(5) / 5).min(2);
+    let base_left = if count == 1 { 760.0 } else { 610.0 };
+    for guard_index in 0..count {
+        let left = base_left + guard_index as f32 * 155.0;
+        let right = (left + 125.0).min(1000.0);
+        runtime.guards.push(
+            GuardState::human(
+                &format!("Rescued patrol {}", guard_index + 1),
+                left,
+                left,
+                right,
+            )
+            .with_speed(76.0 + index as f32 * 3.0)
+            .with_detection(
+                (195.0 + index as f32 * 4.0).min(255.0),
+                56.0 + (index % 4) as f32 * 2.0,
+            ),
+        );
+    }
+    if index % 5 == 0 {
+        runtime.guards.push(
+            GuardState::turret("Reset defense turret", 790.0, 260.0).with_detection(310.0, 62.0),
+        );
+    }
+}
+
+fn build_villain_room(runtime: &mut LevelRuntime, index: usize) {
+    runtime.ambience.emergency = true;
+    runtime.ambience.sparks = index % 2 == 0;
+    runtime.ambience.smoke = index % 3 == 0;
+    runtime.ambience.darkness = index % 4 == 0;
+    runtime.ambience.quiet = index % 5 == 2;
+    runtime.ambience.turret_hacked = index % 6 == 5;
+    if index == 0 {
+        runtime.ambience.gravity_off = true;
+    }
+
+    runtime.guards.push(
+        GuardState::human("Broken patrol", 800.0, 760.0, 900.0)
+            .with_speed(22.0)
+            .with_detection(70.0, 44.0)
+            .panicked(),
+    );
+    if index % 2 == 0 {
+        runtime
+            .guards
+            .push(GuardState::human("Downed crew", 930.0, 930.0, 930.0).dead());
+    }
+    if index % 6 == 5 {
+        runtime
+            .guards
+            .push(GuardState::turret("Hacked turret", 780.0, 260.0).inactive());
+    }
+}
+
+fn build_final_battle(runtime: &mut LevelRuntime, route: MoralChoice) {
+    runtime.console = None;
+    runtime.exit_unlocked = false;
     runtime.platforms.clear();
     runtime
         .platforms
         .push(Rect::new(0.0, FLOOR_Y, WORLD_WIDTH, WORLD_HEIGHT - FLOOR_Y));
+    runtime.platforms.push(Rect::new(190.0, 410.0, 170.0, 18.0));
+    runtime.platforms.push(Rect::new(760.0, 390.0, 170.0, 18.0));
+
+    match route {
+        MoralChoice::Savior => {
+            runtime.ambience.clean = true;
+            runtime.ambience.emergency = true;
+            runtime.boss = Some(BossState::central_ai());
+            runtime.guards.push(
+                GuardState::turret("AI defense node", 240.0, 266.0).with_detection(310.0, 64.0),
+            );
+        }
+        MoralChoice::Villain => {
+            runtime.core = None;
+            runtime.ambience.emergency = true;
+            runtime.ambience.sparks = true;
+            runtime.ambience.darkness = true;
+            runtime.boss = Some(BossState::captain());
+            runtime.guards.push(
+                GuardState::elite("Captain's last marine", 615.0, 560.0, 690.0)
+                    .with_detection(250.0, 60.0),
+            );
+        }
+    }
 }

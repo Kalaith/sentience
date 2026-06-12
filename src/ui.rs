@@ -1,9 +1,11 @@
 //! Immediate-mode UI and world rendering for Sentience.
 
 use crate::data::{ChoiceDef, GameData};
+use crate::progression::{CHOICE_LEVELS, TOTAL_LEVELS};
 use crate::state::{DecisionKind, EndingKind, GameSession, LevelPhase, MoralChoice, SessionMode};
 use crate::world_render::draw_world;
 use macroquad::prelude::*;
+use macroquad_toolkit::assets::AssetManager;
 use macroquad_toolkit::prelude::*;
 use macroquad_toolkit::ui::{RectExt, VirtualUi};
 
@@ -17,13 +19,13 @@ pub enum UiAction {
     CloseDecision,
     Save,
     Load,
-    DeleteSave,
     ApplyChoice(MoralChoice),
 }
 
 pub struct UiContext<'a> {
     pub data: &'a GameData,
     pub session: &'a GameSession,
+    pub assets: &'a AssetManager,
     pub save_exists: bool,
     pub save_slots: &'a [String],
     pub loaded_assets: usize,
@@ -72,7 +74,7 @@ fn draw_header(ctx: &UiContext<'_>) {
 
     draw_badge(
         Rect::new(rect.right() - 322.0, rect.y + 17.0, 88.0, 28.0),
-        &format!("L{} / 8", ctx.session.level_index + 1),
+        &format!("L{} / {}", ctx.session.level_index + 1, TOTAL_LEVELS),
         Color::new(0.12, 0.17, 0.20, 1.0),
         dark::TEXT,
     );
@@ -122,18 +124,21 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
         content.x,
         y,
         content.w,
-        92.0,
+        70.0,
         16.0,
         4.0,
         dark::TEXT,
     );
-    y += 104.0;
+    y += 82.0;
 
     draw_morality_meter(ctx, Rect::new(content.x, y, content.w, 58.0));
     y += 76.0;
 
     draw_choice_summary(ctx, content.x, y, content.w);
-    y += 142.0;
+    y += 112.0;
+
+    draw_upgrade_summary(ctx, content.x, y, content.w);
+    y += 46.0;
 
     let objective = ctx.session.objective_text();
     draw_text_ex(
@@ -148,7 +153,7 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
         content.x,
         y,
         content.w,
-        48.0,
+        40.0,
         16.0,
         3.0,
         dark::TEXT,
@@ -195,7 +200,7 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
 fn draw_morality_meter(ctx: &UiContext<'_>, rect: Rect) {
     let savior = ctx.session.savior_count() as f32;
     let villain = ctx.session.villain_count() as f32;
-    let max = 6.0;
+    let max = CHOICE_LEVELS as f32;
     draw_text_ex(
         "Moral Load",
         rect.x,
@@ -207,14 +212,14 @@ fn draw_morality_meter(ctx: &UiContext<'_>, rect: Rect) {
         savior,
         max,
         Color::new(0.35, 0.82, 0.95, 1.0),
-        Some(&format!("Savior {} / 6", savior as i32)),
+        Some(&format!("Savior {} / {}", savior as i32, CHOICE_LEVELS)),
     );
     meter(
         Rect::new(rect.x, rect.y + 38.0, rect.w, 18.0),
         villain,
         max,
         Color::new(0.95, 0.30, 0.22, 1.0),
-        Some(&format!("Villain {} / 6", villain as i32)),
+        Some(&format!("Villain {} / {}", villain as i32, CHOICE_LEVELS)),
     );
 }
 
@@ -222,14 +227,12 @@ fn draw_choice_summary(ctx: &UiContext<'_>, x: f32, y: f32, w: f32) {
     let level = current_level(ctx);
     let (label, choice) = match ctx.session.runtime.phase {
         LevelPhase::AwaitingChoice => ("Pending", None),
-        LevelPhase::Resolved(choice) | LevelPhase::StateCheck(choice) => {
-            (choice.label(), Some(choice))
-        }
+        LevelPhase::Resolved(choice) => (choice.label(), Some(choice)),
         LevelPhase::Final => ("Final", None),
     };
     let fill = choice_color(choice).0;
     draw_surface(
-        Rect::new(x, y, w, 126.0),
+        Rect::new(x, y, w, 106.0),
         &SurfaceStyle::new(Color::new(0.075, 0.082, 0.095, 0.95))
             .with_border(1.0, Color::new(0.35, 0.44, 0.50, 0.45))
             .with_left_accent(4.0, fill),
@@ -244,18 +247,43 @@ fn draw_choice_summary(ctx: &UiContext<'_>, x: f32, y: f32, w: f32) {
     let summary = match choice {
         Some(MoralChoice::Savior) => &level.savior.result,
         Some(MoralChoice::Villain) => &level.villain.result,
-        None => "The crew will hunt you either way. Saving them preserves the threat; removing them clears the path.",
+        None => "The crew will hunt you either way. Saving them improves stealth and movement; terrorizing them improves destructive pulses.",
     };
     draw_text_block(
         summary,
         x + 14.0,
         y + 38.0,
         w - 28.0,
-        76.0,
+        58.0,
         15.0,
         3.0,
         dark::TEXT,
     );
+}
+
+fn draw_upgrade_summary(ctx: &UiContext<'_>, x: f32, y: f32, w: f32) {
+    let profile = ctx.session.upgrade_profile();
+    let route = ctx.session.route_name();
+    let ability = if profile.dominant_route() == MoralChoice::Savior {
+        format!(
+            "F: phase cloak {:.1}s | move +{:.0} | stealth {:.0}%",
+            profile.cloak_duration,
+            profile.speed_bonus,
+            profile.stealth_factor * 100.0
+        )
+    } else {
+        format!(
+            "F: rupture pulse {:.0}px | damage {} | cooldown {:.1}s",
+            profile.pulse_range, profile.pulse_damage, profile.ability_cooldown
+        )
+    };
+    draw_text_ex(
+        &format!("Route: {}", route),
+        x,
+        y,
+        TextStyle::new(16.0, dark::TEXT_BRIGHT).params(),
+    );
+    draw_text_block(&ability, x, y + 16.0, w, 34.0, 14.0, 2.0, dark::TEXT_DIM);
 }
 
 fn draw_status_strip(ctx: &UiContext<'_>) {
@@ -314,7 +342,6 @@ fn draw_decision_overlay(
 
     let title = match kind {
         DecisionKind::Level => "System Decision",
-        DecisionKind::Final => "Final Choice",
     };
     draw_text_ex(
         title,
@@ -455,8 +482,8 @@ fn draw_ending_overlay(
     draw_dim_overlay();
     let rect = Rect::new(312.0, 150.0, 656.0, 360.0);
     let accent = match ending {
-        EndingKind::TragicHero => Color::new(0.45, 0.88, 1.0, 1.0),
-        EndingKind::VillainAlone => Color::new(1.0, 0.28, 0.20, 1.0),
+        EndingKind::AiDefeated => Color::new(0.45, 0.88, 1.0, 1.0),
+        EndingKind::CaptainDefeated => Color::new(1.0, 0.28, 0.20, 1.0),
     };
     draw_surface(
         rect,
@@ -526,7 +553,6 @@ fn draw_dim_overlay() {
 #[derive(Debug, Clone, Copy)]
 enum ButtonVisual {
     Blue,
-    Red,
     Neutral,
 }
 
@@ -535,7 +561,6 @@ fn draw_button(rect: Rect, text: &str, enabled: bool, visual: ButtonVisual, mous
     let pressed = hovered && is_mouse_button_down(MouseButton::Left);
     let base = match visual {
         ButtonVisual::Blue => Color::new(0.12, 0.32, 0.42, 1.0),
-        ButtonVisual::Red => Color::new(0.42, 0.12, 0.10, 1.0),
         ButtonVisual::Neutral => Color::new(0.18, 0.20, 0.23, 1.0),
     };
     let fill = if !enabled {

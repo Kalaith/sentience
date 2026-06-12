@@ -3,9 +3,14 @@
 use macroquad::prelude::*;
 
 mod data;
+mod entities;
 mod game;
 mod geometry;
 mod levels;
+mod progression;
+mod render_textures;
+#[cfg(test)]
+mod route_tests;
 mod state;
 mod ui;
 mod world_render;
