@@ -7,9 +7,56 @@
     <title>Sentience | Web Hatchery Games</title>
     <link rel="stylesheet" href="../shared.css">
     <style>
+        .game-page {
+            box-sizing: border-box;
+        }
+
+        .game-container {
+            margin-inline: auto;
+        }
+
         .game-container canvas {
+            width: 100% !important;
+            height: 100% !important;
             image-rendering: pixelated;
             image-rendering: crisp-edges;
+        }
+
+        .game-container:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            max-height: none;
+            border-radius: 0;
+        }
+
+        @media (max-height: 820px) {
+            .game-page {
+                max-width: min(1200px, calc((100vh - 7.25rem) * 16 / 9));
+            }
+
+            .game-header {
+                padding: 0.5rem 0;
+                margin-bottom: 0.75rem;
+            }
+
+            .game-header h1 {
+                font-size: 1.45rem;
+            }
+
+            .game-controls {
+                gap: 0.75rem;
+                padding: 0.5rem 0;
+            }
+
+            .game-info {
+                margin-top: 1rem;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .game-controls {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>

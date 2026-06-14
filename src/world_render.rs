@@ -9,6 +9,7 @@ use crate::world_map_art::draw_map_art;
 use crate::world_setpieces::draw_setpieces;
 use macroquad::prelude::*;
 use macroquad_toolkit::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text_ex;
 
 pub(crate) fn draw_world(ctx: &UiContext<'_>) {
     let rect = world_panel_rect();
@@ -319,13 +320,13 @@ fn draw_boss_health(ctx: &UiContext<'_>, boss: &BossState) {
         1.0,
         Color::new(0.9, 0.9, 0.9, 0.45),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         &format!("{} {}/{}", boss.kind.label(), boss.health, boss.max_health),
         rect.x,
         rect.y - 6.0,
         TextStyle::new(14.0, dark::TEXT_BRIGHT).params(),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         &format!("Route: {}", ctx.session.route_name()),
         rect.x + rect.w + 16.0,
         rect.y + 14.0,

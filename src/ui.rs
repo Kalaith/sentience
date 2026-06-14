@@ -7,6 +7,7 @@ use crate::world_render::draw_world;
 use macroquad::prelude::*;
 use macroquad_toolkit::assets::AssetManager;
 use macroquad_toolkit::prelude::*;
+use macroquad_toolkit::ui::draw_ui_text_ex;
 use macroquad_toolkit::ui::{RectExt, VirtualUi};
 
 pub const LOGICAL_WIDTH: f32 = 1280.0;
@@ -59,13 +60,13 @@ fn draw_header(ctx: &UiContext<'_>) {
     draw_surface(rect, &style);
 
     let level = current_level(ctx);
-    draw_text_ex(
+    draw_ui_text_ex(
         &ctx.data.config.display_name,
         rect.x + 18.0,
         rect.y + 38.0,
         TextStyle::new(30.0, dark::TEXT_BRIGHT).params(),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         &format!("{} / {}", level.sector, level.title),
         rect.x + 190.0,
         rect.y + 38.0,
@@ -101,7 +102,7 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
             .with_header(42.0, Color::new(0.09, 0.105, 0.12, 1.0))
             .with_header_divider(1.0, Color::new(0.42, 0.50, 0.56, 0.4)),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         "Ship Systems",
         rect.x + 16.0,
         rect.y + 27.0,
@@ -112,7 +113,7 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
     let content = rect.inset(16.0);
     let mut y = content.y + 50.0;
 
-    draw_text_ex(
+    draw_ui_text_ex(
         &level.puzzle,
         content.x,
         y,
@@ -152,7 +153,7 @@ fn draw_side_panel(ctx: &UiContext<'_>, mouse: Vec2, actions: &mut Vec<UiAction>
     y += 46.0;
 
     let objective = ctx.session.objective_text();
-    draw_text_ex(
+    draw_ui_text_ex(
         "Objective",
         content.x,
         y,
@@ -212,7 +213,7 @@ fn draw_morality_meter(ctx: &UiContext<'_>, rect: Rect) {
     let savior = ctx.session.savior_count() as f32;
     let villain = ctx.session.villain_count() as f32;
     let max = CHOICE_LEVELS as f32;
-    draw_text_ex(
+    draw_ui_text_ex(
         "Moral Load",
         rect.x,
         rect.y,
@@ -248,7 +249,7 @@ fn draw_choice_summary(ctx: &UiContext<'_>, x: f32, y: f32, w: f32) {
             .with_border(1.0, Color::new(0.35, 0.44, 0.50, 0.45))
             .with_left_accent(4.0, fill),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         label,
         x + 14.0,
         y + 26.0,
@@ -288,7 +289,7 @@ fn draw_upgrade_summary(ctx: &UiContext<'_>, x: f32, y: f32, w: f32) {
             profile.pulse_range, profile.pulse_damage, profile.ability_cooldown
         )
     };
-    draw_text_ex(
+    draw_ui_text_ex(
         &format!("Route: {}", route),
         x,
         y,
@@ -318,7 +319,7 @@ fn draw_status_strip(ctx: &UiContext<'_>) {
         SessionMode::Dismantled(_) => "Captured",
         SessionMode::Ending(_) => "Ending reached",
     };
-    draw_text_ex(
+    draw_ui_text_ex(
         mode,
         rect.x + 18.0,
         rect.y + 34.0,
@@ -354,7 +355,7 @@ fn draw_decision_overlay(
     let title = match kind {
         DecisionKind::Level => "System Decision",
     };
-    draw_text_ex(
+    draw_ui_text_ex(
         title,
         rect.x + 22.0,
         rect.y + 35.0,
@@ -443,13 +444,13 @@ fn draw_choice_card(
         .with_border(1.0, Color::new(accent.r, accent.g, accent.b, 0.75))
         .with_left_accent(5.0, accent),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         choice.label(),
         rect.x + 18.0,
         rect.y + 30.0,
         TextStyle::new(22.0, dark::TEXT_BRIGHT).params(),
     );
-    draw_text_ex(
+    draw_ui_text_ex(
         &def.action,
         rect.x + 18.0,
         rect.y + 62.0,
@@ -470,7 +471,7 @@ fn draw_choice_card(
     );
 
     if !enabled {
-        draw_text_ex(
+        draw_ui_text_ex(
             "Locked in",
             rect.right() - 88.0,
             rect.y + 30.0,
