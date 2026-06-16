@@ -373,14 +373,13 @@ impl GameSession {
 
     fn available_decision(&self) -> Option<DecisionKind> {
         let player = inflate(self.player_rect(), 16.0);
-        if self.can_open_level_decision() {
-            if self
+        if self.can_open_level_decision()
+            && self
                 .runtime
                 .console
                 .is_some_and(|console| rects_overlap(player, console))
-            {
-                return Some(DecisionKind::Level);
-            }
+        {
+            return Some(DecisionKind::Level);
         }
 
         None

@@ -46,7 +46,7 @@ fn map_ten_matches_badge_printer_checkpoint_spec() {
         "map 10 should include an upper office supervisor"
     );
 
-    let helpful = build_level(9, &vec![MoralChoice::Savior; 10]);
+    let helpful = build_level(9, &[MoralChoice::Savior; 10]);
     assert!(has_setpiece(&helpful, SetpieceKind::ScannerGate));
     assert_eq!(
         helpful.guards.len(),
@@ -65,7 +65,7 @@ fn map_ten_matches_badge_printer_checkpoint_spec() {
         "helpful checkpoint exit should use the upper/authorized route"
     );
 
-    let gremlin = build_level(9, &vec![MoralChoice::Villain; 10]);
+    let gremlin = build_level(9, &[MoralChoice::Villain; 10]);
     assert!(has_setpiece(&gremlin, SetpieceKind::GateJam));
     assert!(has_setpiece(&gremlin, SetpieceKind::WrongBadgeLoop));
     assert!(
@@ -114,7 +114,7 @@ fn map_eleven_matches_drone_bay_sorting_floor_spec() {
         "map 11 should begin with two dormant drones"
     );
 
-    let helpful = build_level(10, &vec![MoralChoice::Savior; 11]);
+    let helpful = build_level(10, &[MoralChoice::Savior; 11]);
     assert!(has_setpiece(&helpful, SetpieceKind::RescueDronePath));
     assert_eq!(
         helpful.guards.len(),
@@ -135,7 +135,7 @@ fn map_eleven_matches_drone_bay_sorting_floor_spec() {
         "map 11 exit should sit behind the drone-serviced hatch"
     );
 
-    let gremlin = build_level(10, &vec![MoralChoice::Villain; 11]);
+    let gremlin = build_level(10, &[MoralChoice::Villain; 11]);
     assert!(has_setpiece(&gremlin, SetpieceKind::EnthusiasticDroneCarry));
     assert!(
         gremlin.ambience.gravity_off,
@@ -186,7 +186,7 @@ fn map_twelve_matches_brig_door_puzzle_spec() {
         "map 12 should start with three prisoners in cells"
     );
 
-    let helpful = build_level(11, &vec![MoralChoice::Savior; 12]);
+    let helpful = build_level(11, &[MoralChoice::Savior; 12]);
     assert_eq!(
         count_setpieces(&helpful, SetpieceKind::OneWayDoor),
         2,
@@ -202,7 +202,7 @@ fn map_twelve_matches_brig_door_puzzle_spec() {
         "helpful brig route should finish through the evidence lock"
     );
 
-    let gremlin = build_level(11, &vec![MoralChoice::Villain; 12]);
+    let gremlin = build_level(11, &[MoralChoice::Villain; 12]);
     assert!(has_setpiece(&gremlin, SetpieceKind::WrongWaitingRoom));
     assert!(has_setpiece(&gremlin, SetpieceKind::RevolvingDoorLoop));
     assert!(
@@ -254,7 +254,7 @@ fn map_thirteen_matches_observatory_shutter_ring_spec() {
         "map 13 should include a gantry guard"
     );
 
-    let helpful = build_level(12, &vec![MoralChoice::Savior; 13]);
+    let helpful = build_level(12, &[MoralChoice::Savior; 13]);
     assert_eq!(
         helpful.guards.len(),
         2,
@@ -265,7 +265,7 @@ fn map_thirteen_matches_observatory_shutter_ring_spec() {
         "helpful route should intensify searchlight coverage"
     );
 
-    let gremlin = build_level(12, &vec![MoralChoice::Villain; 13]);
+    let gremlin = build_level(12, &[MoralChoice::Villain; 13]);
     assert!(has_setpiece(&gremlin, SetpieceKind::ShadowLane));
     assert!(has_setpiece(&gremlin, SetpieceKind::GlareLane));
     assert!(
@@ -315,7 +315,7 @@ fn map_fourteen_matches_armory_safety_failure_spec() {
         "map 14 should start with two stun turrets and one foam launcher"
     );
 
-    let helpful = build_level(13, &vec![MoralChoice::Savior; 14]);
+    let helpful = build_level(13, &[MoralChoice::Savior; 14]);
     assert_eq!(
         helpful.guards.len(),
         5,
@@ -331,7 +331,7 @@ fn map_fourteen_matches_armory_safety_failure_spec() {
         "helpful armory route should keep turret logic active"
     );
 
-    let gremlin = build_level(13, &vec![MoralChoice::Villain; 14]);
+    let gremlin = build_level(13, &[MoralChoice::Villain; 14]);
     assert!(has_setpiece(&gremlin, SetpieceKind::FoamPile));
     assert!(
         gremlin.ambience.smoke && gremlin.ambience.sparks && gremlin.ambience.turret_hacked,
@@ -380,7 +380,7 @@ fn map_fifteen_matches_laundry_tube_network_spec() {
         "map 15 should begin with one guard and two crew members"
     );
 
-    let helpful = build_level(14, &vec![MoralChoice::Savior; 15]);
+    let helpful = build_level(14, &[MoralChoice::Savior; 15]);
     assert_eq!(
         helpful.guards.len(),
         2,
@@ -392,7 +392,7 @@ fn map_fifteen_matches_laundry_tube_network_spec() {
         "helpful laundry route should finish through a higher tube exit"
     );
 
-    let gremlin = build_level(14, &vec![MoralChoice::Villain; 15]);
+    let gremlin = build_level(14, &[MoralChoice::Villain; 15]);
     assert!(has_setpiece(&gremlin, SetpieceKind::UniformRetrievalTube));
     assert!(
         gremlin.ambience.gravity_off,
@@ -440,7 +440,7 @@ fn map_sixteen_matches_captains_quarters_permissions_spec() {
         "map 16 should start with two elite guards and one briefing officer"
     );
 
-    let helpful = build_level(15, &vec![MoralChoice::Savior; 16]);
+    let helpful = build_level(15, &[MoralChoice::Savior; 16]);
     assert_eq!(
         helpful.guards.len(),
         3,
@@ -451,7 +451,7 @@ fn map_sixteen_matches_captains_quarters_permissions_spec() {
         "helpful command route should finish through the upper escape/evidence path"
     );
 
-    let gremlin = build_level(15, &vec![MoralChoice::Villain; 16]);
+    let gremlin = build_level(15, &[MoralChoice::Villain; 16]);
     assert!(has_setpiece(&gremlin, SetpieceKind::FalseOrderTrail));
     assert!(
         gremlin.ambience.quiet && gremlin.ambience.turret_hacked,
@@ -509,14 +509,14 @@ fn map_seventeen_matches_reactor_foam_descent_spec() {
         "map 17 should start with two engineers and one heat-gear guard"
     );
 
-    let helpful = build_level(16, &vec![MoralChoice::Savior; 17]);
+    let helpful = build_level(16, &[MoralChoice::Savior; 17]);
     assert_eq!(
         helpful.guards.len(),
         3,
         "helpful coolant flow should add three repair engineers"
     );
 
-    let gremlin = build_level(16, &vec![MoralChoice::Villain; 17]);
+    let gremlin = build_level(16, &[MoralChoice::Villain; 17]);
     assert!(has_setpiece(&gremlin, SetpieceKind::FoamBubble));
     assert!(
         gremlin.ambience.smoke && gremlin.ambience.sparks,
@@ -563,7 +563,7 @@ fn map_eighteen_matches_core_lift_scheduler_spec() {
         "map 18 should begin with one guard and two elevator security units"
     );
 
-    let helpful = build_level(17, &vec![MoralChoice::Savior; 18]);
+    let helpful = build_level(17, &[MoralChoice::Savior; 18]);
     assert!(has_setpiece(&helpful, SetpieceKind::ElevatorSecurityUnit));
     assert_eq!(
         helpful.guards.len(),
@@ -575,7 +575,7 @@ fn map_eighteen_matches_core_lift_scheduler_spec() {
         "helpful lift route should exit at the top-right landing"
     );
 
-    let gremlin = build_level(17, &vec![MoralChoice::Villain; 18]);
+    let gremlin = build_level(17, &[MoralChoice::Villain; 18]);
     assert!(has_setpiece(&gremlin, SetpieceKind::WrongFloorDoor));
     assert!(has_setpiece(&gremlin, SetpieceKind::EmptyLiftWindow));
     assert!(
@@ -625,7 +625,7 @@ fn map_nineteen_matches_moral_firewall_spec() {
         "map 19 should include two movable data canisters"
     );
 
-    let helpful = build_level(18, &vec![MoralChoice::Savior; 19]);
+    let helpful = build_level(18, &[MoralChoice::Savior; 19]);
     assert!(has_setpiece(&helpful, SetpieceKind::TruthRoute));
     assert_eq!(
         helpful.guards.len(),
@@ -649,7 +649,7 @@ fn map_nineteen_matches_moral_firewall_spec() {
         "current gremlin firewall choice should still add propaganda route logic"
     );
 
-    let gremlin = build_level(18, &vec![MoralChoice::Villain; 19]);
+    let gremlin = build_level(18, &[MoralChoice::Villain; 19]);
     assert!(has_setpiece(&gremlin, SetpieceKind::PropagandaRoute));
     assert!(
         gremlin.ambience.smoke
