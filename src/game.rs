@@ -2,7 +2,8 @@
 
 use crate::data::GameData;
 use crate::state::{
-    migrate_save_value, ControlInput, EndingKind, GameSession, MoralChoice, SaveData, SessionEvent,
+    migrate_save_value, ControlInput, DecisionKind, EndingKind, GameSession, MoralChoice,
+    SaveData, SessionEvent, SessionMode,
 };
 use crate::ui::{self, UiAction, UiContext};
 use macroquad::prelude::*;
@@ -204,6 +205,18 @@ impl Game {
     fn refresh_save_state(&mut self) {
         self.save_exists = slot_exists(&self.data.config.game_name, &self.data.config.save_slot);
         self.save_slots = get_save_slots(&self.data.config.game_name);
+    }
+
+    /// Seed a specific scene for the screenshot harness.
+    pub fn begin_capture_scene(&mut self, scene: &str) {
+        match scene {
+            "decision" => self.session.mode = SessionMode::DecisionOpen(DecisionKind::Level),
+            "ending" => self.session.mode = SessionMode::Ending(EndingKind::MixedIndependence),
+            _ => {
+                // Default: the boot flow already lands directly in gameplay at
+                // level 0, so there is nothing else to seed.
+            }
+        }
     }
 }
 
