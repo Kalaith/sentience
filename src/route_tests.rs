@@ -5,6 +5,7 @@ use crate::geometry::{rect_bottom, rect_center, FLOOR_Y, PLAYER_H};
 use crate::levels::build_level;
 use crate::progression::{CHOICE_LEVELS, TOTAL_LEVELS};
 use crate::state::{ControlInput, EndingKind, GameSession, GuardKind, MoralChoice, SessionMode};
+use macroquad_toolkit::timing::Cooldown;
 
 const DT: f32 = 1.0 / 60.0;
 
@@ -259,7 +260,7 @@ fn session_at(data: &GameData, level_index: usize, choices: Vec<MoralChoice>) ->
     session.player.grounded = true;
     session.player.crouching = false;
     session.player.cloak_timer = 0.0;
-    session.player.ability_cooldown = 0.0;
+    session.player.ability_cooldown = Cooldown::new(0.0);
     session.player.pulse_timer = 0.0;
     session.mode = SessionMode::Playing;
     session
@@ -317,7 +318,7 @@ fn final_input(session: &GameSession, route: MoralChoice, frame: usize) -> Contr
 }
 
 fn should_use_route_ability(session: &GameSession, _frame: usize) -> bool {
-    if session.player.ability_cooldown > 0.0 {
+    if !session.player.ability_cooldown.is_ready() {
         return false;
     }
     if let Some(boss) = session.runtime.boss.as_ref() {

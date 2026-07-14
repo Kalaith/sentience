@@ -8,6 +8,7 @@ use crate::geometry::{
 use crate::levels::build_level;
 use crate::progression::{campaign_route, CampaignRoute, UpgradeProfile, CHOICE_LEVELS};
 use macroquad::prelude::*;
+use macroquad_toolkit::timing::Cooldown;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -85,7 +86,7 @@ pub struct PlayerState {
     pub crouching: bool,
     pub grounded: bool,
     pub cloak_timer: f32,
-    pub ability_cooldown: f32,
+    pub ability_cooldown: Cooldown,
     pub pulse_timer: f32,
 }
 
@@ -99,7 +100,7 @@ impl PlayerState {
             crouching: false,
             grounded: true,
             cloak_timer: 0.0,
-            ability_cooldown: 0.0,
+            ability_cooldown: Cooldown::new(0.0),
             pulse_timer: 0.0,
         }
     }
@@ -409,17 +410,17 @@ impl GameSession {
 
     fn update_player_timers(&mut self, dt: f32) {
         self.player.cloak_timer = (self.player.cloak_timer - dt).max(0.0);
-        self.player.ability_cooldown = (self.player.ability_cooldown - dt).max(0.0);
+        self.player.ability_cooldown.tick(dt);
         self.player.pulse_timer = (self.player.pulse_timer - dt).max(0.0);
     }
 
     fn use_route_ability(&mut self) -> Option<SessionEvent> {
-        if self.player.ability_cooldown > 0.0 {
+        if !self.player.ability_cooldown.is_ready() {
             return None;
         }
 
         let profile = self.upgrade_profile();
-        self.player.ability_cooldown = profile.ability_cooldown;
+        self.player.ability_cooldown = Cooldown::new_armed(profile.ability_cooldown);
         self.player.pulse_timer = 0.28;
 
         match profile.dominant_route() {
