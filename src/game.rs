@@ -2,8 +2,8 @@
 
 use crate::data::GameData;
 use crate::state::{
-    migrate_save_value, ControlInput, DecisionKind, EndingKind, GameSession, MoralChoice,
-    SaveData, SessionEvent, SessionMode,
+    migrate_save_value, ControlInput, DecisionKind, EndingKind, GameSession, MoralChoice, SaveData,
+    SessionEvent, SessionMode,
 };
 use crate::ui::{self, UiAction, UiContext};
 use macroquad::prelude::*;

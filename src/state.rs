@@ -8,7 +8,7 @@ use crate::geometry::{
 use crate::levels::build_level;
 use crate::progression::{campaign_route, CampaignRoute, UpgradeProfile, CHOICE_LEVELS};
 use macroquad::prelude::*;
-use macroquad_toolkit::timing::Cooldown;
+use macroquad_toolkit::timing::{Cooldown, Timer};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -85,9 +85,9 @@ pub struct PlayerState {
     pub vy: f32,
     pub crouching: bool,
     pub grounded: bool,
-    pub cloak_timer: f32,
+    pub cloak_timer: Timer,
     pub ability_cooldown: Cooldown,
-    pub pulse_timer: f32,
+    pub pulse_timer: Timer,
 }
 
 impl PlayerState {
@@ -99,9 +99,9 @@ impl PlayerState {
             vy: 0.0,
             crouching: false,
             grounded: true,
-            cloak_timer: 0.0,
+            cloak_timer: Timer::new(0.0),
             ability_cooldown: Cooldown::new(0.0),
-            pulse_timer: 0.0,
+            pulse_timer: Timer::new(0.0),
         }
     }
 }
@@ -409,9 +409,9 @@ impl GameSession {
     }
 
     fn update_player_timers(&mut self, dt: f32) {
-        self.player.cloak_timer = (self.player.cloak_timer - dt).max(0.0);
+        self.player.cloak_timer.tick(dt);
         self.player.ability_cooldown.tick(dt);
-        self.player.pulse_timer = (self.player.pulse_timer - dt).max(0.0);
+        self.player.pulse_timer.tick(dt);
     }
 
     fn use_route_ability(&mut self) -> Option<SessionEvent> {
@@ -421,11 +421,11 @@ impl GameSession {
 
         let profile = self.upgrade_profile();
         self.player.ability_cooldown = Cooldown::new_armed(profile.ability_cooldown);
-        self.player.pulse_timer = 0.28;
+        self.player.pulse_timer = Timer::new(0.28);
 
         match profile.dominant_route() {
             MoralChoice::Savior => {
-                self.player.cloak_timer = profile.cloak_duration;
+                self.player.cloak_timer = Timer::new(profile.cloak_duration);
                 if let Some(message) = self.damage_boss_near_player(1 + (profile.savior / 6) as i32)
                 {
                     return Some(SessionEvent::BossDamaged(message));
@@ -490,14 +490,14 @@ impl GameSession {
             return;
         };
 
-        boss.danger_timer = (boss.danger_timer - dt).max(0.0);
-        boss.attack_timer -= dt;
-        if boss.attack_timer <= 0.0 {
-            boss.danger_timer = 0.78;
-            boss.attack_timer = match boss.kind {
+        boss.danger_timer.tick(dt);
+        boss.attack_timer.tick(dt);
+        if boss.attack_timer.is_ready() {
+            boss.danger_timer = Timer::new(0.78);
+            boss.attack_timer = Cooldown::new_armed(match boss.kind {
                 BossKind::CentralAi => 2.1,
                 BossKind::Captain => 1.65,
-            };
+            });
         }
 
         if boss.kind == BossKind::Captain {
@@ -514,7 +514,7 @@ impl GameSession {
 
     fn detected_by_boss_hazard(&self) -> Option<String> {
         let boss = self.runtime.boss.as_ref()?;
-        if boss.danger_timer <= 0.0 || self.player.cloak_timer > 0.0 {
+        if boss.danger_timer.finished() || !self.player.cloak_timer.finished() {
             return None;
         }
         if rects_overlap(self.player_rect(), boss.danger_rect()) {
@@ -668,7 +668,7 @@ impl GameSession {
         if !guard.active || !guard.alive {
             return false;
         }
-        if self.player.cloak_timer > 0.0 {
+        if !self.player.cloak_timer.finished() {
             return false;
         }
 

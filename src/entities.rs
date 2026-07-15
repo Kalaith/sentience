@@ -3,6 +3,7 @@
 use crate::geometry::FLOOR_Y;
 use crate::state::LevelPhase;
 use macroquad::prelude::*;
+use macroquad_toolkit::timing::{Cooldown, Timer};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum GuardKind {
@@ -157,8 +158,8 @@ pub struct BossState {
     pub dir: f32,
     pub health: i32,
     pub max_health: i32,
-    pub attack_timer: f32,
-    pub danger_timer: f32,
+    pub attack_timer: Cooldown,
+    pub danger_timer: Timer,
 }
 
 impl BossState {
@@ -172,8 +173,8 @@ impl BossState {
             dir: 1.0,
             health: 8,
             max_health: 8,
-            attack_timer: 1.2,
-            danger_timer: 0.0,
+            attack_timer: Cooldown::new_armed(1.2),
+            danger_timer: Timer::new(0.0),
         }
     }
 
@@ -187,8 +188,8 @@ impl BossState {
             dir: -1.0,
             health: 9,
             max_health: 9,
-            attack_timer: 1.0,
-            danger_timer: 0.0,
+            attack_timer: Cooldown::new_armed(1.0),
+            danger_timer: Timer::new(0.0),
         }
     }
 

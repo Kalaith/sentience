@@ -181,7 +181,7 @@ fn draw_boss_if_present(ctx: &UiContext<'_>, view: &WorldView) {
     let Some(boss) = ctx.session.runtime.boss.as_ref() else {
         return;
     };
-    if boss.danger_timer > 0.0 {
+    if !boss.danger_timer.finished() {
         let danger = view.rect(boss.danger_rect());
         draw_rectangle(
             danger.x,
@@ -651,7 +651,7 @@ fn draw_player(ctx: &UiContext<'_>, view: &WorldView) {
             Color::new(0.12, 0.88, 0.95, 0.12),
         );
     }
-    if ctx.session.player.cloak_timer > 0.0 {
+    if !ctx.session.player.cloak_timer.finished() {
         draw_circle_lines(
             body.x + body.w * 0.5,
             body.y + body.h * 0.48,
@@ -660,7 +660,7 @@ fn draw_player(ctx: &UiContext<'_>, view: &WorldView) {
             Color::new(0.4, 0.95, 1.0, 0.75),
         );
     }
-    if ctx.session.player.pulse_timer > 0.0 {
+    if !ctx.session.player.pulse_timer.finished() {
         let profile = ctx.session.upgrade_profile();
         draw_circle_lines(
             body.x + body.w * 0.5,
