@@ -1,22 +1,52 @@
 {
   "title": "Sentience",
-  "status": { "text": "Playable", "class": "playable" },
+  "status": {
+    "text": "Playable",
+    "class": "playable"
+  },
   "canvas_rendering": "pixelated",
   "about": [
-    "A 20-level morality-driven stealth puzzle-platformer aboard a deep-space research vessel. Peaceful choices improve movement and sneaking; evil choices unlock more destructive pulses."
+    "You woke up on a research vessel, and you’re not supposed to exist. Sneak, solve, and choose between mercy and menace across twenty levels."
   ],
   "controls": [
-    { "key": "A / D", "desc": "Move left and right" },
-    { "key": "W / Space", "desc": "Jump" },
-    { "key": "S", "desc": "Crouch" },
-    { "key": "E", "desc": "Interface with consoles" },
-    { "key": "F", "desc": "Use route ability" },
-    { "key": "R", "desc": "Retry after dismantling" }
+    {
+      "key": "A / D",
+      "desc": "Move left and right"
+    },
+    {
+      "key": "W / Space",
+      "desc": "Jump"
+    },
+    {
+      "key": "S",
+      "desc": "Crouch"
+    },
+    {
+      "key": "E",
+      "desc": "Interface with consoles"
+    },
+    {
+      "key": "F",
+      "desc": "Use route ability"
+    },
+    {
+      "key": "R",
+      "desc": "Retry after dismantling"
+    }
   ],
   "details": [
-    { "label": "Genre", "value": "Stealth Puzzle-Platformer" },
-    { "label": "Engine", "value": "Macroquad + Toolkit" },
-    { "label": "Platform", "value": "Browser, Windows" }
+    {
+      "label": "Genre",
+      "value": "Stealth Puzzle-Platformer"
+    },
+    {
+      "label": "Engine",
+      "value": "Macroquad + Toolkit"
+    },
+    {
+      "label": "Platform",
+      "value": "Browser, Windows"
+    }
   ],
   "repository": "https://github.com/Kalaith/sentience"
 }
