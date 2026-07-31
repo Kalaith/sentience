@@ -48,10 +48,9 @@ Use the project validation path:
 ```powershell
 .\publish.ps1
 ```
-# Practical Future Improvements
 
-- Add replayable stealth tests for line-of-sight, alert escalation, cloak timing, crouch/jump movement, and dismantle boundaries.
-- Split morality-route branching from movement so savior and villain progression trees can be tested independently.
-- Add level fixtures for each sector that validate console choices, patrol layouts, upgrades, and final confrontation routing.
-- Add migration tests for campaign progress when level data, morality flags, or route upgrades change.
+## Documentation
+
+- `MAPS_AND_CHOICES.md` — the 20-map campaign spec; `map_spec_tests.rs` and `map_spec_late_tests.rs` assert the levels against it.
+- `TODO.md` — everything still open.
 
