@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "assets": [
+    "assets/images/ai_core.png",
+    "assets/images/captain.png",
+    "assets/images/crate.png",
+    "assets/images/guard.png",
+    "assets/images/machine.png",
+    "assets/images/robot.png",
+    "assets/images/ship_background.png",
+    "assets/images/maps/airlock_oopsnasium.png",
+    "assets/images/maps/armory_bad_ideas.png",
+    "assets/images/maps/brig.png",
+    "assets/images/maps/captains_quarters.png",
+    "assets/images/maps/central_core.png",
+    "assets/images/maps/core_lift.png",
+    "assets/images/maps/crate_etiquette.png",
+    "assets/images/maps/cryo_daycare.png",
+    "assets/images/maps/drone_bay.png",
+    "assets/images/maps/hydroponics_problem.png",
+    "assets/images/maps/laundry_transit.png",
+    "assets/images/maps/med_bay_courtesy.png",
+    "assets/images/maps/mess_hall_mayhem.png",
+    "assets/images/maps/moral_firewall.png",
+    "assets/images/maps/observatory.png",
+    "assets/images/maps/reactor_walkway.png",
+    "assets/images/maps/scrap_wake.png",
+    "assets/images/maps/security_badge_printer.png",
+    "assets/images/maps/suit_locker.png",
+    "assets/images/maps/ventilation_negotiations.png"
+  ]
+}
