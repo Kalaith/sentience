@@ -1,7 +1,7 @@
 //! Embedded campaign data and asset manifests.
 
 use macroquad_toolkit::assets::TextureConfig;
-use macroquad_toolkit::data_loader::{load_embedded_json, load_embedded_json_labeled};
+use macroquad_toolkit::data_loader::load_embedded_json_labeled;
 use serde::{Deserialize, Serialize};
 
 const GAME_CONFIG_JSON: &str =
@@ -55,7 +55,8 @@ impl GameData {
     pub fn load() -> Result<Self, String> {
         let config = load_embedded_json_labeled("game_config", GAME_CONFIG_JSON)?;
         let levels = load_embedded_json_labeled("levels", LEVELS_JSON)?;
-        let texture_manifest = load_embedded_json(TEXTURE_MANIFEST_JSON)?;
+        let texture_manifest =
+            load_embedded_json_labeled("texture_manifest", TEXTURE_MANIFEST_JSON)?;
 
         Ok(Self {
             config,
